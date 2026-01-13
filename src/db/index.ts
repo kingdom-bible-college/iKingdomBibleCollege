@@ -1,7 +1,24 @@
 import { drizzle } from 'drizzle-orm/neon-http';
-import { neon } from '@neondatabase/serverless';
+import { neon, NeonQueryFunction } from '@neondatabase/serverless';
 
-const connectionString = process.env.DATABASE_URL || '';
+let sql: NeonQueryFunction<false, false>;
+let _db: ReturnType<typeof drizzle>;
 
-const sql = neon(connectionString);
-export const db = drizzle(sql);
+function getDb() {
+  if (!_db) {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error('DATABASE_URL is not set');
+    }
+    sql = neon(connectionString);
+    _db = drizzle(sql);
+  }
+  return _db;
+}
+
+// Proxy를 사용해서 기존 코드와 호환되게
+export const db = new Proxy({} as ReturnType<typeof drizzle>, {
+  get(_, prop) {
+    return getDb()[prop as keyof ReturnType<typeof drizzle>];
+  },
+});
