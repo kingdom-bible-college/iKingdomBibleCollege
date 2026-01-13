@@ -1,11 +1,7 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
 
 const connectionString = process.env.DATABASE_URL || '';
 
-const client = postgres(connectionString, {
-  ssl: connectionString ? 'require' : undefined,
-  max: 1,
-});
-
-export const db = drizzle(client);
+const sql = neon(connectionString);
+export const db = drizzle(sql);
