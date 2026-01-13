@@ -1,0 +1,273 @@
+.page {
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+.main {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  color: #111827;
+  margin: 0;
+}
+
+.progress {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+.quizCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+}
+
+.termSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.quizTerm {
+  font-size: 2.5rem;
+  color: #111827;
+  margin: 0;
+}
+
+.showBtn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.showBtn:hover {
+  background: #4338ca;
+}
+
+.answerSection {
+  margin-top: 1.5rem;
+}
+
+.definition {
+  font-size: 1.25rem;
+  color: #374151;
+  margin-bottom: 0.75rem;
+}
+
+.example {
+  color: #6b7280;
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.wrongBtn {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.wrongBtn:hover {
+  background: #fee2e2;
+}
+
+.correctBtn {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.correctBtn:hover {
+  background: #dcfce7;
+}
+
+.resultCard {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 3rem;
+  text-align: center;
+}
+
+.resultTitle {
+  font-size: 2rem;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.resultScore {
+  font-size: 1.5rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.resultPercent {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #4f46e5;
+  margin-bottom: 2rem;
+}
+
+.restartBtn {
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.restartBtn:hover {
+  background: #4338ca;
+}
+
+.empty {
+  text-align: center;
+  color: #9ca3af;
+  padding: 3rem;
+  background: #f9fafb;
+  border-radius: 12px;
+  border: 1px dashed #e5e7eb;
+}
+
+.description {
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.categoryCard {
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.categoryCard:hover:not(:disabled) {
+  border-color: #4f46e5;
+  background: #f5f3ff;
+}
+
+.categoryCard.selected {
+  border-color: #4f46e5;
+  background: #4f46e5;
+  color: white;
+}
+
+.categoryCard:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.categoryName {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.categoryCount {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.startBtn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.startBtn:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.startBtn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.backBtn {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.backBtn:hover {
+  background: #e5e7eb;
+}
+
+.currentCategory {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.resultCategory {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.resultButtons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}

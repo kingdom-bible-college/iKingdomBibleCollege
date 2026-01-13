@@ -16,12 +16,14 @@ export type NewUser = typeof users.$inferInsert;
 // 단어 테이블
 export const words = pgTable('words', {
   id: serial('id').primaryKey(),
-  term: varchar('term', { length: 255 }).notNull(),        // 단어
-  definition: text('definition').notNull(),                // 정의
-  example: text('example'),                                // 예문 (선택)
+  term: varchar('term', { length: 255 }).notNull(),
+  definition: text('definition').notNull(),
+  example: text('example'),
+  category: varchar('category', { length: 50 }).default('기타'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 // 타입 추출
 export type Word = typeof words.$inferSelect;
 export type NewWord = typeof words.$inferInsert;
+

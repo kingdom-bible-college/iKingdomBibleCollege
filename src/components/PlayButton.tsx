@@ -1,86 +1,93 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 type Props = {
   text: string;
 };
+
+// 전역 오디오 참조 (겹침 방지)
+let currentAudio: HTMLAudioElement | null = null;
 
 export function PlayButton({ text }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const clickCountRef = useRef(0);
   const lastClickTimeRef = useRef(0);
 
-  const handlePlay = useCallback(async () => {
-    if (isLoading) return;
-    
+  const handleClick = async () => {
+    // 이전 오디오 정지
+    if (currentAudio) {
+      currentAudio.pause();
+      currentAudio = null;
+    }
+
+    // 더블클릭 감지 (0.5초 이내)
     const now = Date.now();
-    
-    // 3초 이내 재클릭이면 카운트 증가, 아니면 리셋
-    if (now - lastClickTimeRef.current < 3000) {
+    if (now - lastClickTimeRef.current < 500) {
       clickCountRef.current += 1;
     } else {
       clickCountRef.current = 1;
     }
     lastClickTimeRef.current = now;
-    
-    const isSlowMode = clickCountRef.current >= 2;
-    
-    setIsLoading(true);
-    
-    try {
-      const savedConfig = localStorage.getItem('tts-config');
-      const config = savedConfig ? JSON.parse(savedConfig) : {
-        voice: 'en-US-Neural2-J',
-        rate: 0.9,
-        pitch: 0,
-      };
 
-      // 2번째 클릭이면 0.3 느리게
-      const adjustedRate = isSlowMode 
-        ? Math.max(0.25, config.rate - 0.2)  // 최소 0.25
-        : config.rate;
+    // 2번째 클릭이면 느리게
+    const isSlowMode = clickCountRef.current >= 2;
+    const rate = isSlowMode ? 0.6 : 0.9;
+
+    setIsLoading(true);
+
+    try {
+      // localStorage에서 설정 가져오기
+      const savedSettings = localStorage.getItem('tts-settings');
+      const settings = savedSettings ? JSON.parse(savedSettings) : {};
 
       const response = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           text,
-          voice: config.voice,
-          rate: adjustedRate,
-          pitch: config.pitch,
+          voice: settings.voice || 'en-US-Neural2-J',
+          rate: isSlowMode ? 0.6 : (settings.rate || 0.9),
+          pitch: settings.pitch || 0,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('TTS API failed');
+      if (response.ok) {
+        const data = await response.json();
+        const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+        currentAudio = audio;
+        audio.play();
+      } else {
+        // 실패시 브라우저 TTS 사용
+        fallbackTTS(text, rate);
       }
-
-      const data = await response.json();
-      const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
-      audio.play();
     } catch (error) {
-      console.error('TTS Error:', error);
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      speechSynthesis.speak(utterance);
+      fallbackTTS(text, rate);
     } finally {
       setIsLoading(false);
     }
-  }, [text, isLoading]);
+  };
+
+  const fallbackTTS = (text: string, rate: number) => {
+    window.speechSynthesis.cancel(); // 이전 발음 취소
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'en-US';
+    utterance.rate = rate;
+    window.speechSynthesis.speak(utterance);
+  };
 
   return (
-    <button 
-      onClick={handlePlay}
+    <button
+      onClick={handleClick}
       disabled={isLoading}
       style={{
         background: 'none',
         border: 'none',
-        fontSize: '1.5rem',
-        cursor: isLoading ? 'wait' : 'pointer',
+        cursor: 'pointer',
+        fontSize: '1.2rem',
         opacity: isLoading ? 0.5 : 1,
       }}
-      aria-label={`${text} 발음 듣기`}
+      title="발음 듣기"
     >
       {isLoading ? '⏳' : '🔊'}
     </button>
