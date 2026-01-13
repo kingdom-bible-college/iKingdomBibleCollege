@@ -1,4 +1,7 @@
+export const dynamic = 'force-dynamic';
 import { getAllWords } from '@/db/queries/words';
+import { PlayButton } from '@/components/PlayButton';
+import { TTSSettings } from '@/components/TTSSettings';
 import styles from './page.module.css';
 
 export default async function Home() {
@@ -7,8 +10,10 @@ export default async function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <h1 className={styles.title}>📚 Daily Vocab</h1>
-        <p className={styles.description}>매일 새로운 단어를 학습하세요</p>
+        {/* <h1 className={styles.title}>📚 Daily Vocab</h1> */}
+        {/* <p className={styles.description}>매일 새로운 단어를 학습하세요</p> */}
+        
+        <TTSSettings />
         
         <section className={styles.wordList}>
           {words.length === 0 ? (
@@ -16,7 +21,10 @@ export default async function Home() {
           ) : (
             words.map((word) => (
               <article key={word.id} className={styles.wordCard}>
-                <h2 className={styles.term}>{word.term}</h2>
+                <div className={styles.cardHeader}>
+                  <h2 className={styles.term}>{word.term}</h2>
+                  <PlayButton text={word.term} />
+                </div>
                 <p className={styles.definition}>{word.definition}</p>
                 {word.example && (
                   <p className={styles.example}>💡 {word.example}</p>
