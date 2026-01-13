@@ -28,8 +28,8 @@ export function PracticeClient({ words }: Props) {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <h1 className={styles.title}>📖 단어 연습</h1>
-        <p className={styles.description}>단어를 보고 뜻을 외워보세요</p>
+        <h1 className={styles.title}>📖 장문 연습</h1>
+        <p className={styles.description}>장문을 보고 단어를 외워보세요</p>
 
         <div className={styles.filters}>
           {CATEGORIES.map((cat) => (
