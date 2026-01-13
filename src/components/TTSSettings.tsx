@@ -27,7 +27,7 @@ export function TTSSettings() {
 
   // localStorage에서 설정 불러오기
   useEffect(() => {
-    const saved = localStorage.getItem('tts-config');
+    const saved = localStorage.getItem('tts-settings');
     if (saved) {
       setConfig(JSON.parse(saved));
     }
@@ -37,7 +37,7 @@ export function TTSSettings() {
   const updateConfig = (key: keyof TTSConfig, value: string | number) => {
     const newConfig = { ...config, [key]: value };
     setConfig(newConfig);
-    localStorage.setItem('tts-config', JSON.stringify(newConfig));
+    localStorage.setItem('tts-settings', JSON.stringify(newConfig));
   };
 
   return (
