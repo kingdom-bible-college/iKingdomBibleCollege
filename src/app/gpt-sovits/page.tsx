@@ -13,36 +13,38 @@ interface VoicePreset {
 
 const VOICE_PRESETS: VoicePreset[] = [
   {
-    name: '근석 목소리',
-    ref_audio_path: '/Users/abc/GPT-SoVITS/output/slicer_opt/근석(남).mp3_01.wav',
-    prompt_text: '여러분, 안녕하세요! 지금부터 세계 곳곳의 주요 이슈를 짧고 간결하게 전해드리겠습니다.',
-    // 근석은 pretrained 모델 사용 (별도 학습 없음)
+    name: '기본 (Pretrained)',
+    ref_audio_path: '/home/test02/GPT-SoVITS/output/slicer_opt/A-A2-A-009-0101.wav_0000000000_0000185600.wav',
+    prompt_text: '지금 싸움을 외면하라는 겁니까, 동료들의 죽음에서 눈을 돌리라는 말씀이냐고요?',
+    // Pretrained 모델 사용
   },
   {
-    name: '승현 (뉴스)',
-    ref_audio_path: '/Users/abc/GPT-SoVITS/output/slicer_opt/승현(남).mp3_0000647360_0000838080.wav',
-    prompt_text: '이러한 변화는 환경보호뿐만 아니라 미래산업과 일자리 창출에도 중요한 영향을 미치고 있습니다.',
-    gpt_model: 'GPT_weights_v2Pro/승현-e15.ckpt',
-    sovits_model: 'SoVITS_weights_v2Pro/승현_e8_s352.pth',
+    name: 'A 모델 (e15) - A 오디오',
+    ref_audio_path: '/home/test02/GPT-SoVITS/output/slicer_opt/A-A2-A-009-0101.wav_0000000000_0000185600.wav',
+    prompt_text: '지금 싸움을 외면하라는 겁니까, 동료들의 죽음에서 눈을 돌리라는 말씀이냐고요?',
+    gpt_model: 'GPT_weights_v2Pro/A-e15.ckpt',
+    sovits_model: 'SoVITS_weights_v2Pro/xxx_e8_s200.pth',
   },
   {
-    name: '조훈 (뉴스)',
-    ref_audio_path: '/Users/abc/GPT-SoVITS/output/slicer_opt/조훈.mp3_0000048320_0000259200.wav',
-    prompt_text: '여러분 안녕하세요. 지금부터 세계 곳곳의 주요 이슈를 짧고 간결하게 전해드리겠습니다.',
-    gpt_model: 'GPT_weights_v2Pro/조훈-e15.ckpt',
-    sovits_model: 'SoVITS_weights_v2Pro/조훈_e8_s360.pth',
+    name: 'A 모델 (e15) - B 오디오',
+    ref_audio_path: '/home/test02/GPT-SoVITS/output/slicer_opt/b.wav_0000000000_0000167360.wav',
+    prompt_text: '이른바 햄버거병 유발 가능성이 있는 햄버거용 패티를',
+    gpt_model: 'GPT_weights_v2Pro/A-e15.ckpt',
+    sovits_model: 'SoVITS_weights_v2Pro/xxx_e8_s200.pth',
   },
   {
-    name: '구리 (뉴스)',
-    ref_audio_path: '/Users/abc/GPT-SoVITS/output/slicer_opt/구리(남).mp3_0000000000_0000187520.wav',
-    prompt_text: '여러분 안녕하세요? 지금부터 세계 곳곳의 주요 이슈를 짧고 간결하게 전해드리겠습니다!',
-    gpt_model: 'GPT_weights_v2Pro/구리(남)-e15.ckpt',
-    sovits_model: 'SoVITS_weights_v2Pro/구리(남)_e8_s304.pth',
+    name: 'A 모델 (e15) - KsponSpeech 오디오',
+    ref_audio_path: '/home/test02/GPT-SoVITS/output/slicer_opt/KsponSpeech_042090.wav_0000015680_0000155840.wav',
+    prompt_text: '맨날 만나서 노는 게 똑같은 거 같애 노래방 가고 맛있는 거 먹고',
+    gpt_model: 'GPT_weights_v2Pro/A-e15.ckpt',
+    sovits_model: 'SoVITS_weights_v2Pro/xxx_e8_s200.pth',
   },
   {
-    name: '기본 참조',
-    ref_audio_path: '/Users/abc/GPT-SoVITS/dummy_ref.wav',
+    name: '직접 입력 (서버 경로)',
+    ref_audio_path: '',
     prompt_text: '',
+    gpt_model: '',
+    sovits_model: '',
   },
 ];
 
@@ -65,6 +67,27 @@ export default function GPTSoVITSPage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 커스텀 입력 상태
+  const [customRefPath, setCustomRefPath] = useState('');
+  const [customGptPath, setCustomGptPath] = useState('');
+  const [customSovitsPath, setCustomSovitsPath] = useState('');
+  const [customPromptText, setCustomPromptText] = useState('');
+
+  // 선택된 보이스가 변경될 때 커스텀 필드 초기화 또는 설정
+  useEffect(() => {
+    if (selectedVoice.name !== '직접 입력 (서버 경로)') {
+      // 일반 프리셋 선택 시
+      setCustomRefPath('');
+      setCustomGptPath('');
+      setCustomSovitsPath('');
+      setCustomPromptText('');
+    } else {
+      // 직접 입력 선택 시 기존 값 유지 (사용자가 입력 중일 수 있음)
+    }
+  }, [selectedVoice]);
+
+
 
   const maxLength = 1000;
 
@@ -105,11 +128,11 @@ export default function GPTSoVITSPage() {
         },
         body: JSON.stringify({
           text,
-          ref_audio_path: selectedVoice.ref_audio_path,
-          prompt_text: selectedVoice.prompt_text,
+          ref_audio_path: selectedVoice.name === '직접 입력 (서버 경로)' ? customRefPath : selectedVoice.ref_audio_path,
+          prompt_text: selectedVoice.name === '직접 입력 (서버 경로)' ? customPromptText : selectedVoice.prompt_text,
           speed: speechSpeed,
-          gpt_model: selectedVoice.gpt_model,
-          sovits_model: selectedVoice.sovits_model,
+          gpt_model: selectedVoice.name === '직접 입력 (서버 경로)' ? (customGptPath || undefined) : selectedVoice.gpt_model,
+          sovits_model: selectedVoice.name === '직접 입력 (서버 경로)' ? (customSovitsPath || undefined) : selectedVoice.sovits_model,
         }),
       });
 
@@ -168,7 +191,17 @@ export default function GPTSoVITSPage() {
   const playRefAudio = async () => {
     // 참조 오디오 파일을 API를 통해 가져오기
     try {
-      const response = await fetch(`/api/ref-audio?path=${encodeURIComponent(selectedVoice.ref_audio_path)}`);
+      // 직접 입력 모드일 경우 customRefPath 사용, 아니면 selectedVoice 사용
+      const audioPath = selectedVoice.name === '직접 입력 (서버 경로)' 
+        ? customRefPath 
+        : selectedVoice.ref_audio_path;
+
+      if (!audioPath) {
+        console.error('참조 오디오 경로가 없습니다.');
+        return;
+      }
+
+      const response = await fetch(`/api/ref-audio?path=${encodeURIComponent(audioPath)}`);
       if (response.ok) {
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
@@ -252,6 +285,60 @@ export default function GPTSoVITSPage() {
             </div>
           </div>
 
+
+
+          {/* 커스텀 입력 필드 (직접 입력 선택 시에만 표시) */}
+          {selectedVoice.name === '직접 입력 (서버 경로)' && (
+            <div className={styles.customInputContainer} style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#f5f5f5', borderRadius: '8px' }}>
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>참조 오디오 경로 (서버 절대 경로)</label>
+                <input 
+                  type="text" 
+                  value={customRefPath}
+                  onChange={(e) => setCustomRefPath(e.target.value)}
+                  placeholder="/home/user/GPT-SoVITS/audio/ref.wav"
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                />
+                <button 
+                  onClick={playRefAudio}
+                  disabled={!customRefPath}
+                  style={{ marginTop: '8px', padding: '6px 12px', borderRadius: '4px', border: '1px solid #ddd', cursor: customRefPath ? 'pointer' : 'not-allowed', backgroundColor: customRefPath ? '#4CAF50' : '#ccc', color: 'white' }}
+                >
+                  ▶ 참조 오디오 재생
+                </button>
+              </div>
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>GPT 모델 경로 (선택)</label>
+                <input 
+                  type="text" 
+                  value={customGptPath}
+                  onChange={(e) => setCustomGptPath(e.target.value)}
+                  placeholder="GPT_weights/model.ckpt"
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                />
+              </div>
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>SoVITS 모델 경로 (선택)</label>
+                <input 
+                  type="text" 
+                  value={customSovitsPath}
+                  onChange={(e) => setCustomSovitsPath(e.target.value)}
+                  placeholder="SoVITS_weights/model.pth"
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                />
+              </div>
+              <div style={{ marginBottom: '10px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', marginBottom: '4px' }}>참조 오디오 대본</label>
+                <input 
+                  type="text" 
+                  value={customPromptText}
+                  onChange={(e) => setCustomPromptText(e.target.value)}
+                  placeholder="참조 오디오가 말하는 내용 입력"
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #ddd' }}
+                />
+              </div>
+            </div>
+          )}
           <textarea
             className={styles.textarea}
             placeholder="텍스트를 입력하세요..."

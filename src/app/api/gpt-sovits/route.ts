@@ -21,6 +21,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 모델 변경이 필요한 경우 먼저 모델 전환 API 호출
+    if (gpt_model) {
+      const gptSwitchRes = await fetch(
+        `${GPT_SOVITS_API_URL}/set_gpt_weights?weights_path=${encodeURIComponent(gpt_model)}`
+      );
+      if (!gptSwitchRes.ok) {
+        console.error('GPT 모델 전환 실패:', await gptSwitchRes.text());
+      }
+    }
+
+    if (sovits_model) {
+      const sovitsSwitchRes = await fetch(
+        `${GPT_SOVITS_API_URL}/set_sovits_weights?weights_path=${encodeURIComponent(sovits_model)}`
+      );
+      if (!sovitsSwitchRes.ok) {
+        console.error('SoVITS 모델 전환 실패:', await sovitsSwitchRes.text());
+      }
+    }
+
     // api_v2.py 엔드포인트: /tts
     const ttsResponse = await fetch(`${GPT_SOVITS_API_URL}/tts`, {
       method: 'POST',
@@ -34,9 +53,6 @@ export async function POST(request: NextRequest) {
         prompt_text: prompt_text || '',
         prompt_lang: 'ko',
         speed_factor: speed,
-        // 모델 경로 지정 (per-voice model switching)
-        ...(gpt_model && { gpt_model_path: gpt_model }),
-        ...(sovits_model && { sovits_model_path: sovits_model }),
       }),
     });
 
