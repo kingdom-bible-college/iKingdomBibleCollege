@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Daily Vocab - 매일 영어 단어 학습",
-  description: "매일 새로운 영어 단어를 학습하세요",
+  title: "Kingdom Bible College - 온라인 성경 대학",
+  description: "말씀으로 세워지는 하나님 나라의 일꾼을 양성하는 온라인 성경 대학",
 };
 
 export const viewport: Viewport = {

@@ -6,18 +6,18 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link href="/" className={styles.logo}>
-          📚 Daily Vocab
+          ✝️ Kingdom Bible College
         </Link>
         
         <nav className={styles.nav}>
           <Link href="/" className={styles.navLink}>
             홈
           </Link>
-          <Link href="/practice" className={styles.navLink}>
-            연습
+          <Link href="/courses" className={styles.navLink}>
+            강의
           </Link>
-          <Link href="/quiz" className={styles.navLink}>
-            퀴즈
+          <Link href="/about" className={styles.navLink}>
+            소개
           </Link>
         </nav>
       </div>
