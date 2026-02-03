@@ -671,3 +671,146 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Admission New Styles */
+.admissionGroup {
+  margin-bottom: 80px;
+}
+
+.admissionSubTitle {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1.5rem;
+  color: #1a1a3a;
+  margin-bottom: 32px;
+  padding-left: 16px;
+  border-left: 4px solid #c9a227;
+  line-height: 1.2;
+}
+
+.infoBox {
+  background: #fdfdfd;
+  border: 1px solid #eee;
+  padding: 32px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.boxTitle {
+  font-size: 1.15rem;
+  color: #1a1a3a;
+  font-weight: 600;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.boxTitle::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: #c9a227;
+  border-radius: 50%;
+}
+
+.infoList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.infoList li {
+  margin-bottom: 12px;
+  line-height: 1.6;
+  color: #444;
+  display: flex;
+  gap: 8px;
+}
+
+.infoList li strong {
+  color: #222;
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.infoNote {
+  margin-top: 16px;
+  font-size: 0.9rem;
+  color: #666;
+  background: #f0f0f0;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.twoColGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.instructorCard {
+  display: flex;
+  gap: 24px;
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 24px;
+  border-radius: 8px;
+  align-items: center;
+}
+
+.instructorInfo h5 {
+  font-size: 1.1rem;
+  color: #1a1a3a;
+  margin-bottom: 8px;
+}
+
+.instructorInfo ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.instructorInfo li {
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.curriculumTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+}
+
+.curriculumTable th,
+.curriculumTable td {
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.curriculumTable th {
+  background: #f9f9f9;
+  font-weight: 600;
+  color: #1a1a3a;
+  width: 30%;
+}
+
+.curriculumTable td {
+  color: #444;
+}
+
+.requirementBox {
+  border: 1px solid #c9a227;
+  background: rgba(201, 162, 39, 0.05); /* Gold with low opacity */
+  padding: 32px;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .twoColGrid {
+    grid-template-columns: 1fr;
+  }
+}

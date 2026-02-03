@@ -324,71 +324,158 @@ export default function AboutPage() {
             <div className={styles.contentSection}>
               <h2 className={styles.contentTitle}>2026학년도 모집요강</h2>
               
-              <div className={styles.admissionContainer}>
-                <div className={styles.admissionInfo}>
-                  <div className={styles.admissionGrid}>
-                    <div className={styles.infoColumn}>
-                      <div className={styles.infoItem}>
-                        <span className={styles.infoLabel}>모집 학기</span>
-                        <div className={styles.infoValue}>
-                          <span className={styles.infoIcon}>📅</span>
-                          2026학년도 봄학기 (18주 과정)
-                        </div>
-                      </div>
-                      <div className={styles.infoItem}>
-                        <span className={styles.infoLabel}>지원 자격</span>
-                        <div className={styles.infoValue}>
-                          <span className={styles.infoIcon}>✅</span>
-                          세례교인 이상, 사역에 헌신된 자
-                        </div>
-                      </div>
+              {/* 1. 학사 일정 및 등록 안내 */}
+              <div className={styles.admissionGroup}>
+                <h3 className={styles.admissionSubTitle}>1. 학사 일정 및 등록 안내</h3>
+                
+                <div className={styles.infoBox}>
+                  <h4 className={styles.boxTitle}>학사 일정</h4>
+                  <ul className={styles.infoList}>
+                    <li><strong>등록 마감</strong><span>3월 6일(금)</span></li>
+                    <li><strong>개강 예배</strong><span>3월 17일(화) (OT 포함)</span></li>
+                    <li><strong>종강 예배</strong><span>6월 18일(목)</span></li>
+                  </ul>
+                  <p className={styles.infoNote}>
+                    * 하반기 실습 훈련: 비정기적 현장 실습 훈련이 7월–10월 중 진행될 예정입니다.
+                  </p>
+                </div>
+
+                <div className={styles.twoColGrid}>
+                  <div className={styles.infoBox}>
+                    <h4 className={styles.boxTitle}>등록금 안내</h4>
+                    <ul className={styles.infoList}>
+                      <li><strong>일반 등록</strong><span>48만 원 (VAT 포함)</span></li>
+                      <li><strong>사전 등록</strong><span>40만 원 (VAT 포함)</span></li>
+                    </ul>
+                    <p style={{fontSize: '0.85rem', color: '#888', marginTop: '8px'}}>
+                      (리빙캠퍼스 기간 내 등록 / 오메가교회 성도)
+                    </p>
+                  </div>
+                  <div className={styles.infoBox}>
+                    <h4 className={styles.boxTitle}>등록 계좌</h4>
+                    <ul className={styles.infoList}>
+                      <li><strong>국민은행</strong><span>461301-04-610726</span></li>
+                      <li><strong>예금주</strong><span>비전스테이션미니스트리</span></li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className={styles.infoBox}>
+                  <h4 className={styles.boxTitle}>등록 문의 및 연락처</h4>
+                  <div className={styles.twoColGrid} style={{marginBottom: 0}}>
+                    <ul className={styles.infoList}>
+                      <li><strong>이메일</strong><span>ikingdombiblecollege@gmail.com</span></li>
+                      <li><strong>홈페이지</strong><span>www.ikingdombiblecollege.com</span></li>
+                      <li><strong>주소</strong><span>대전 서구 도안중로 304-10 (도안동 1483)</span></li>
+                    </ul>
+                    <ul className={styles.infoList}>
+                      <li><strong>KBC 본교</strong><span>042-824-3242</span></li>
+                      <li><strong>사무처장</strong><span>도현우 (010-3542-3703)</span></li>
+                      <li><strong>간사</strong><span>전미라 (010-8966-0558)</span></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. 강좌 및 강사 소개 */}
+              <div className={styles.admissionGroup}>
+                <h3 className={styles.admissionSubTitle}>2. 강좌 및 강사 소개</h3>
+                
+                <div className={styles.twoColGrid}>
+                  <div className={styles.instructorCard}>
+                    <div className={styles.profileIcon} style={{width: '60px', height: '60px', fontSize: '2rem'}}>👤</div>
+                    <div className={styles.instructorInfo}>
+                      <h5>황성은 목사</h5>
+                      <ul>
+                        <li>오메가교회 담임</li>
+                        <li>킹덤바이블칼리지 학장</li>
+                      </ul>
                     </div>
-                    <div className={styles.infoColumn}>
-                      <div className={styles.infoItem}>
-                        <span className={styles.infoLabel}>등록 기간</span>
-                        <div className={styles.infoValue}>
-                          <span className={styles.infoIcon}>⏰</span>
-                          2025. 12. 01 ~ 2026. 02. 20
-                        </div>
-                      </div>
-                      <div className={styles.infoItem}>
-                        <span className={styles.infoLabel}>등록금</span>
-                        <div className={styles.infoValue}>
-                          <span className={styles.infoIcon}>💰</span>
-                          학기당 300,000원 (장학 혜택 별도)
-                        </div>
-                      </div>
+                  </div>
+                  <div className={styles.instructorCard}>
+                    <div className={styles.profileIcon} style={{width: '60px', height: '60px', fontSize: '2rem'}}>👤</div>
+                    <div className={styles.instructorInfo}>
+                      <h5>김태현 목사</h5>
+                      <ul>
+                        <li>오메가교회 선교목사</li>
+                        <li>킹덤바이블칼리지 부학장</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
 
-                <div className={styles.admissionSteps}>
-                  <h3 className={styles.introTitle} style={{fontSize: '1.2rem', marginBottom: '20px'}}>전형 절차</h3>
-                  <div className={styles.stepList}>
-                    <div className={styles.stepItem}>
-                      <div className={styles.stepCircle}>1</div>
-                      <h4 className={styles.stepTitle}>원서 접수</h4>
-                      <p className={styles.stepDesc}>온라인 지원서 작성</p>
+                <div className={styles.infoBox}>
+                  <h4 className={styles.boxTitle}>전체 강좌 구성</h4>
+                  <table className={styles.curriculumTable}>
+                    <tbody>
+                      <tr>
+                        <th>현장 강의</th>
+                        <td>
+                          <strong>황성은 목사</strong> (복음 전도와 제자도 / 사도행전적 교회 개척 운동)<br />
+                          <strong>김태현 목사</strong> (이스라엘 선교 / 선교개론)
+                        </td>
+                      </tr>
+                      <tr>
+                        <th>온라인 강의</th>
+                        <td>
+                          <strong>파송 선교사</strong> (특강)<br />
+                          <strong>이재환 선교사</strong> (요나선교학교)<br />
+                          <strong>조수아 선교사</strong> (이슬람 선교)<br />
+                          <strong>윤성철 목사</strong> (예배와 선교)<br />
+                          <strong>함철홍 교수</strong> (요한계시록)
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p className={styles.infoNote}>
+                    * 수강생 특전: 필수 온라인 강의 외에도 다양한 강의를 자유롭게 선택 수강 가능
+                  </p>
+                </div>
+              </div>
+
+              {/* 3. 교육 과정 */}
+              <div className={styles.admissionGroup}>
+                <h3 className={styles.admissionSubTitle}>3. 교육 과정</h3>
+                
+                <div className={styles.twoColGrid}>
+                  <div className={styles.infoBox}>
+                    <h4 className={styles.boxTitle}>상반기 (3–6월)</h4>
+                    <p style={{color:'#666', marginBottom:'12px'}}>화–목 / 09:00–13:00</p>
+                    <ul className={styles.infoList}>
+                      <li>1. 통전적 성경연구</li>
+                      <li>2. 선교 중심 현장 강의</li>
+                      <li>3. 토의 및 발제</li>
+                      <li>4. 해외 단기 아웃리치 (필리핀, 인도 등)</li>
+                    </ul>
+                  </div>
+                  <div className={styles.infoBox}>
+                    <h4 className={styles.boxTitle}>하반기 (7–10월)</h4>
+                    <p style={{color:'#666', marginBottom:'12px'}}>비정기적 현장 실습</p>
+                    <ul className={styles.infoList}>
+                      <li>1. KBC 인텐시브 코스 (9월)</li>
+                      <li>2. 기도 집중 훈련</li>
+                      <li>3. 토의 및 발제</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className={styles.requirementBox}>
+                  <h4 className={styles.boxTitle}>수료 및 졸업 요건</h4>
+                  <div className={styles.twoColGrid} style={{marginBottom: 0}}>
+                    <div>
+                      <h5 style={{fontSize: '1rem', fontWeight: 600, marginBottom: '8px'}}>수료 기준</h5>
+                      <ul className={styles.infoList} style={{fontSize: '0.95rem'}}>
+                        <li>• 교육 과정 80% 이상 출석</li>
+                        <li>• 킹덤컨퍼런스 1회 이상 참여</li>
+                        <li>• (재수강생) 신규과정 이수 및 할인 적용</li>
+                      </ul>
                     </div>
-                    <div className={styles.stepItem}>
-                      <div className={styles.stepCircle}>2</div>
-                      <h4 className={styles.stepTitle}>서류 심사</h4>
-                      <p className={styles.stepDesc}>지원 자격 확인</p>
-                    </div>
-                    <div className={styles.stepItem}>
-                      <div className={styles.stepCircle}>3</div>
-                      <h4 className={styles.stepTitle}>면접</h4>
-                      <p className={styles.stepDesc}>온라인/오프라인 면접</p>
-                    </div>
-                    <div className={styles.stepItem}>
-                      <div className={styles.stepCircle}>4</div>
-                      <h4 className={styles.stepTitle}>합격 발표</h4>
-                      <p className={styles.stepDesc}>개별 통보</p>
-                    </div>
-                    <div className={styles.stepItem}>
-                      <div className={styles.stepCircle}>5</div>
-                      <h4 className={styles.stepTitle}>등록</h4>
-                      <p className={styles.stepDesc}>등록금 납부</p>
+                    <div>
+                      <h5 style={{fontSize: '1rem', fontWeight: 600, marginBottom: '8px'}}>졸업 요건</h5>
+                      <ul className={styles.infoList} style={{fontSize: '0.95rem'}}>
+                        <li>• 킹덤바이블칼리지 수료 (필수)</li>
+                        <li>• 선택 요건 택 1 (해외 SM / 국내 캠퍼스 선교)</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
