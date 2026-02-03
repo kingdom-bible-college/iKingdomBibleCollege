@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
 
 type MenuType = 'recommendation' | 'greeting' | 'introduction' | 'admission' | 'partners';
@@ -14,7 +15,16 @@ const menuItems: { id: MenuType; title: string }[] = [
 ];
 
 export default function AboutPage() {
+  const searchParams = useSearchParams();
+  const menuParam = searchParams.get('menu');
+  
   const [activeMenu, setActiveMenu] = useState<MenuType>('recommendation');
+
+  useEffect(() => {
+    if (menuParam && menuItems.some(item => item.id === menuParam)) {
+      setActiveMenu(menuParam as MenuType);
+    }
+  }, [menuParam]);
 
   return (
     <main className={styles.main}>

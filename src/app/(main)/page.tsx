@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./page.module.css";
 
 export default function Home() {
@@ -14,7 +15,9 @@ export default function Home() {
             <br />
             COLLEGE
           </h1>
-          <button className={styles.heroBtn}>KBC 소개</button>
+          <Link href="/about?menu=introduction" className={styles.heroBtn}>
+            KBC 소개
+          </Link>
         </div>
       </section>
 
