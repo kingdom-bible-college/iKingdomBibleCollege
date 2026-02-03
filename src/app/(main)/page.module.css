@@ -69,6 +69,36 @@
   border-color: #fff;
 }
 
+/* Stats Section */
+.stats {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  padding: 60px 24px;
+  background: linear-gradient(180deg, #0a0a1a 0%, #12121f 100%);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.statItem {
+  text-align: center;
+}
+
+.statNumber {
+  display: block;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 3rem;
+  font-weight: 400;
+  color: #c9a227;
+  margin-bottom: 8px;
+}
+
+.statLabel {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.1em;
+}
+
 /* About Section */
 .about {
   padding: 100px 24px;
@@ -152,23 +182,196 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-/* Footer */
-.footer {
-  padding: 24px;
-  background: #1a1a2e;
-  text-align: center;
+/* Testimonials Section */
+.testimonials {
+  padding: 100px 24px;
+  background: #f8f8f8;
 }
 
-.footerLogo {
-  font-size: 0.9rem;
-  letter-spacing: 0.15em;
+.sectionTitle {
+  text-align: center;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: #222;
+  margin-bottom: 60px;
+  letter-spacing: 0.1em;
+}
+
+.testimonialGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.testimonialCard {
+  background: #fff;
+  padding: 40px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.testimonialText {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #444;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.testimonialAuthor {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.authorName {
+  font-weight: 600;
+  color: #222;
+}
+
+.authorInfo {
+  font-size: 0.85rem;
+  color: #888;
+}
+
+/* CTA Section */
+.cta {
+  padding: 100px 24px;
+  text-align: center;
+  background: linear-gradient(180deg, #0f1628 0%, #0a0a1a 100%);
+  color: #fff;
+}
+
+.cta h2 {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 2.5rem;
+  font-weight: 400;
+  margin-bottom: 16px;
+  letter-spacing: 0.1em;
+}
+
+.cta p {
+  font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 40px;
+}
+
+.ctaBtn {
+  padding: 18px 56px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: #0a0a1a;
+  background: #c9a227;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ctaBtn:hover {
+  background: #dbb52f;
+  transform: translateY(-2px);
+}
+
+/* Footer */
+.footer {
+  background: #0a0a0f;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footerContent {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 60px 24px;
+}
+
+.footerSection {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.footerTitle {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  margin-bottom: 20px;
+  color: #fff;
+}
+
+.footerDesc {
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.footerLinks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footerLinks li {
+  margin-bottom: 12px;
+}
+
+.footerLinks a {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.footerLinks a:hover {
+  color: #c9a227;
+}
+
+.footerContact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footerContact li {
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.footerBottom {
+  text-align: center;
+  padding: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footerBottom p {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.05em;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
   .colleges {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .testimonialGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .footerContent {
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+
+  .stats {
+    gap: 40px;
   }
 }
 
@@ -185,6 +388,20 @@
   .collegeCard {
     min-height: 200px;
   }
+
+  .stats {
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+
+  .statItem {
+    width: 40%;
+  }
+
+  .footerContent {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -198,5 +415,9 @@
 
   .aboutContent br {
     display: none;
+  }
+
+  .statNumber {
+    font-size: 2.5rem;
   }
 }
