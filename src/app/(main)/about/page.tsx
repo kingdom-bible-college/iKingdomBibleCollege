@@ -489,42 +489,142 @@ export default function AboutPage() {
               <h2 className={styles.contentTitle}>협력기관(MOU) 현황</h2>
               
               <div className={styles.partnersContainer}>
-                <p className={styles.introText} style={{textAlign: 'center', marginBottom: '20px'}}>
-                  킹덤바이블칼리지는 국내외 유수의 기관 및 교회와 협력하여<br />
-                  하나님 나라 확장을 위한 거룩한 네트워크를 이루고 있습니다.
-                </p>
+                {/* Intro Section */}
+                <div className={styles.partnersIntroBox}>
+                  <p className={styles.partnersIntroText}>
+                    <strong>킹덤바이블칼리지</strong>는 갈보리채플바이블칼리지, 미성대학교, 창조과학회, 드림스드림, 열방대학(YWAM) 등과<br />
+                    사도행전적 선교사, 사역자, 목회자 인재 양성을 위한 <strong>협약(MOU)</strong>을 체결했습니다.
+                  </p>
+                  <p className={styles.partnersIntroText} style={{marginBottom: 0}}>
+                    MOU 협약식을 통해 갈보리채플바이블칼리지 Joel Wingo 학장과 미성대학교 이상훈 총장,<br />
+                    창조과학회 이경호 회장을 비롯한 각 기관과 함께<br />
+                    킹덤바이블칼리지의 사도행전적 사역자 양성 과정에 적극 협력하기로 결의했습니다.
+                  </p>
+                </div>
 
-                <div className={styles.partnersGrid}>
-                  <div className={styles.partnerCard}>
-                    <span className={styles.partnerIcon}>🏛️</span>
-                    <span className={styles.partnerName}>비전스테이션</span>
-                    <span className={styles.partnerCategory}>선교단체</span>
+                <div className={styles.partnersDetailList}>
+                  {/* 1. 미성대학교 */}
+                  <div className={styles.partnerDetailCard}>
+                    <div className={styles.partnerHeader}>
+                      <div className={styles.partnerIconLarge}>🎓</div>
+                      <div className={styles.partnerTitleBox}>
+                        <h3>미성대학교</h3>
+                        <span>America Evangelical University (AEU)</span>
+                      </div>
+                    </div>
+                    <div className={styles.partnerBody}>
+                      <p>
+                        미성대학교는 미국의 대표적인 신학교로, 인가 기관인 ABHE와 ATS에 준회원으로 가입한 교육기관입니다.
+                        오늘날 더욱 요구되는 크리스천 리더십과 목회·선교·사역자를 중심으로 한 신학교육을 제공하며,
+                        신학뿐 아니라 인격·인성·사역적 균형을 고려한 통합적 교육을 추구합니다.
+                      </p>
+                      <p>
+                        이를 통해 성경적 진리와 창조적 학문을 토대로 미래의 크리스천 평신도 지도자, 선교사, 목회자를 양성합니다.
+                      </p>
+                      <div className={styles.mouBenefitBox}>
+                        <span className={styles.mouTitle}>미성대학교 MOU 내용</span>
+                        <ul className={styles.mouList}>
+                          <li>학점 추천서를 통한 입학 우선권</li>
+                          <li>목회학석사(M.Div.) 과정 지원 시 졸업요건 72학점 중 최대 12학점 인정</li>
+                          <li>MA in Ministry Leadership 과정 지원 시 40학점 중 9학점 인정</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
-                  <div className={styles.partnerCard}>
-                    <span className={styles.partnerIcon}>⛪</span>
-                    <span className={styles.partnerName}>오메가교회</span>
-                    <span className={styles.partnerCategory}>협력교회</span>
+
+                  {/* 2. 한국창조과학회 */}
+                  <div className={styles.partnerDetailCard}>
+                    <div className={styles.partnerHeader}>
+                      <div className={styles.partnerIconLarge}>🔬</div>
+                      <div className={styles.partnerTitleBox}>
+                        <h3>한국창조과학회</h3>
+                        <span>Korea Association for Creation Research (KACR)</span>
+                      </div>
+                    </div>
+                    <div className={styles.partnerBody}>
+                      <p>
+                        한국창조과학회는 인간·생물계·우주 등 모든 피조세계의 질서와 조화가 우연이 아닌 지적 설계에 의한 창조임을 과학적으로 증거하고,
+                        다양한 학문 분야와의 융합을 통해 성경적 창조 세계관을 연구·보급하는 단체입니다.
+                      </p>
+                      <p>
+                        1981년 설립 이후 학술 세미나, 창조과학 학술대회, 교육사역, 창조과학 전문인 선교사 파송, 창조과학 캠퍼스 사역,
+                        IT·미디어 사역 등을 통해 활발히 활동하고 있습니다.
+                      </p>
+                    </div>
                   </div>
-                  <div className={styles.partnerCard}>
-                    <span className={styles.partnerIcon}>🎓</span>
-                    <span className={styles.partnerName}>한빛제일교회</span>
-                    <span className={styles.partnerCategory}>협력교회</span>
+
+                  {/* 3. 드림스드림 */}
+                  <div className={styles.partnerDetailCard}>
+                    <div className={styles.partnerHeader}>
+                      <div className={styles.partnerIconLarge}>🏫</div>
+                      <div className={styles.partnerTitleBox}>
+                        <h3>드림스드림</h3>
+                        <span>DreamsDream</span>
+                      </div>
+                    </div>
+                    <div className={styles.partnerBody}>
+                      <p>
+                        드림스드림은 학과 없는 재개발국가 및 지역에 학교를 건립·운영하며, 교육을 통해 영성·인성·전문성을 겸비한 글로벌 인재를 양성하는 단체입니다.
+                      </p>
+                      <p>
+                        전액 장학금 운영과 졸업 후 재능기부 시스템을 통해 모든 학생이 100% 재능기부로 환원하는 구조를 갖추고 있으며,
+                        이를 통해 다음 세대를 살리는 일에 지속적으로 헌신하고 있습니다.
+                      </p>
+                    </div>
                   </div>
-                  <div className={styles.partnerCard}>
-                    <span className={styles.partnerIcon}>🌏</span>
-                    <span className={styles.partnerName}>KWMA</span>
-                    <span className={styles.partnerCategory}>선교연합</span>
+
+                  {/* 4. 열방대학 YWAM */}
+                  <div className={styles.partnerDetailCard}>
+                    <div className={styles.partnerHeader}>
+                      <div className={styles.partnerIconLarge}>🌏</div>
+                      <div className={styles.partnerTitleBox}>
+                        <h3>열방대학 YWAM</h3>
+                        <span>University of the Nations</span>
+                      </div>
+                    </div>
+                    <div className={styles.partnerBody}>
+                      <p>
+                        YWAM은 선교적 비전을 받은 로렌 커닝햄 목사에 의해 1960년대에 설립된 초교파 선교단체입니다.
+                        YWAM은 예수 그리스도를 세상에 알리는 것을 목표로, 선교·교육·자비량 사역을 통해 젊은 세대가 선교적 삶을 살도록 훈련합니다.
+                      </p>
+                      <p>
+                        열방대학(University of the Nations)은 1978년 설립되어 현재 전 세계 142개국에 600여 개 캠퍼스를 운영하고 있으며,
+                        매년 약 15,000명의 학생들이 선교 훈련 및 교육 과정을 이수하고 있습니다.
+                      </p>
+                      <p>
+                        YWAM Korea 및 U of N Korea는 전 세계 YWAM 네트워크와의 연계를 통해 킹덤바이블칼리지와 협력하며
+                        사도행전적 사역자 양성에 함께하고 있습니다.
+                      </p>
+                    </div>
                   </div>
-                  <div className={styles.partnerCard}>
-                    <span className={styles.partnerIcon}>🕊️</span>
-                    <span className={styles.partnerName}>CTS 기독교TV</span>
-                    <span className={styles.partnerCategory}>방송선교</span>
+
+                  {/* 5. 갈보리 채플 바이블 칼리지 */}
+                  <div className={styles.partnerDetailCard}>
+                    <div className={styles.partnerHeader}>
+                      <div className={styles.partnerIconLarge}>⛪</div>
+                      <div className={styles.partnerTitleBox}>
+                        <h3>갈보리 채플 바이블 칼리지</h3>
+                        <span>Calvary Chapel Bible College</span>
+                      </div>
+                    </div>
+                    <div className={styles.partnerBody}>
+                      <p>
+                        갈보리 채플 사역은 미국의 정치·경제적 혼란 속이던 1960년대, 척 스미스(Chuck Smith) 목사의 사역을 통해 시작되었습니다.
+                      </p>
+                      <p>
+                        젊은이들을 향한 복음 전파와 말씀 중심의 제자훈련을 통해 미국 전역과 전 세계로 확산되었으며,
+                        현재는 1,000개 이상의 교회가 개척되고 미국 최대 규모 중 하나인 25개 교회, 평균 출석 성도 3,000명 이상 규모의 교회들이 세워졌습니다.
+                      </p>
+                      <div className={styles.mouBenefitBox}>
+                        <span className={styles.mouTitle}>갈보리채플바이블칼리지 MOU 내용</span>
+                        <ul className={styles.mouList}>
+                          <li>학점 추천서를 통한 입학 우선권</li>
+                          <li>입학 시 등록금 50% 특별 장학 제도</li>
+                        </ul>
+                      </div>
+                    </div>
                   </div>
-                  <div className={styles.partnerCard}>
-                    <span className={styles.partnerIcon}>📚</span>
-                    <span className={styles.partnerName}>두란노서원</span>
-                    <span className={styles.partnerCategory}>문서선교</span>
-                  </div>
+
                 </div>
               </div>
             </div>
