@@ -206,12 +206,123 @@
   font-style: italic;
 }
 
-/* Responsive */
+/* Dean's Greeting */
+.greetingContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.greetingTop {
+  display: flex;
+  background: #1a1a3a;
+  color: #fff;
+  min-height: 360px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.greetingQuoteBox {
+  flex: 1;
+  padding: 60px 48px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.greetingQuote {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1.35rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  z-index: 1;
+}
+
+.greetingQuote::before {
+  content: '“';
+  font-family: Georgia, serif;
+  font-size: 6rem;
+  line-height: 1;
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  color: rgba(255, 255, 255, 0.15);
+}
+
+.greetingImageWrapper {
+  width: 45%;
+  position: relative;
+  background: #eee;
+}
+
+/* Placeholder for Dean's Image - User will replace this */
+.greetingImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  background: #2a2a5a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 10rem;
+}
+
+.greetingBody {
+  color: #444;
+  line-height: 1.9;
+  font-size: 1rem;
+}
+
+.greetingBody p {
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+.greetingSignature {
+  margin-top: 40px;
+  text-align: right;
+  border-top: 1px solid #eee;
+  padding-top: 24px;
+}
+
+.deanName {
+  display: block;
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1a1a3a;
+  margin-bottom: 8px;
+}
+
+.deanRole {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Responsive adjustment for Greeting */
 @media (max-width: 900px) {
-  .contentWrapper {
-    grid-template-columns: 1fr;
+  .greetingTop {
+    flex-direction: column-reverse; /* Image on top on mobile */
+    min-height: auto;
   }
 
+  .greetingImageWrapper {
+    width: 100%;
+    height: 300px;
+  }
+
+  .greetingQuoteBox {
+    padding: 40px 24px;
+  }
+
+  .greetingQuote {
+    font-size: 1.15rem;
+  }
+
+  /* Sidebar Layout Mobile Adjustments */
   .sidebar {
     border-right: none;
     border-bottom: 1px solid #eee;
@@ -255,5 +366,308 @@
 
   .menuItem {
     width: 100%;
+  }
+}
+
+/* Partners */
+.partnersContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.partnersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.partnerCard {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 160px;
+  transition: all 0.3s ease;
+}
+
+.partnerCard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-color: #c9a227;
+}
+
+.partnerIcon {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: #c9a227;
+}
+
+.partnerName {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.partnerCategory {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* KBC Intro New Styles */
+.introHeader {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.sloganMain {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1.8rem;
+  color: #1a1a3a;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.sloganSub {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1.1rem;
+  color: #c9a227;
+  font-weight: 400;
+  margin-bottom: 24px;
+  letter-spacing: 0.05em;
+}
+
+.sloganDivider {
+  width: 40px;
+  height: 2px;
+  background: #eee;
+  margin: 0 auto 24px;
+}
+
+.sloganDesc {
+  color: #555;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  margin-bottom: 16px;
+}
+
+.mvContainer {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 60px;
+}
+
+.mvBox {
+  flex: 1;
+  background: #f8f8f8;
+  padding: 40px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.mvTitle {
+  font-family: 'Times New Roman', Georgia, serif;
+  font-size: 1.4rem;
+  color: #1a1a3a;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #c9a227;
+  display: inline-block;
+}
+
+.mvText {
+  line-height: 1.8;
+  color: #444;
+}
+
+.mvList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mvList li {
+  margin-bottom: 12px;
+  color: #444;
+  line-height: 1.6;
+}
+
+.goalsContainer {
+  display: flex;
+  gap: 32px;
+  margin-bottom: 60px;
+}
+
+.goalCard {
+  flex: 1;
+  background: #fff;
+  border: 1px solid #eee;
+  padding: 40px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.goalTitle {
+  font-size: 1.25rem;
+  color: #1a1a3a;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.goalText {
+  line-height: 1.8;
+  color: #555;
+  font-size: 1.05rem;
+}
+
+.goalList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+  display: inline-block;
+}
+
+.goalList li {
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.valuesSection {
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.commonTitle {
+  font-size: 1.6rem;
+  color: #1a1a3a;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.valuesIntro {
+  color: #666;
+  margin-bottom: 40px;
+  line-height: 1.8;
+}
+
+.valuesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.valueItem {
+  background: #f9f9f9;
+  padding: 20px 12px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  transition: all 0.3s ease;
+}
+
+.valueItem:hover {
+  background: #1a1a3a;
+  transform: translateY(-5px);
+}
+
+.valueItem:hover * {
+  color: #fff !important;
+}
+
+.valueKey {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #c9a227;
+  margin-bottom: 8px;
+  font-family: 'Times New Roman', Georgia, serif;
+}
+
+.valueWord {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1a1a3a;
+  margin-bottom: 4px;
+}
+
+.valueMeaning {
+  display: block;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.targetSection {
+  background: #f0f2f5;
+  padding: 48px;
+  border-radius: 8px;
+  margin-bottom: 60px;
+  text-align: center;
+}
+
+.targetSub {
+  color: #666;
+  margin-bottom: 32px;
+}
+
+.targetList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  text-align: left;
+}
+
+.targetList li {
+  display: flex;
+  gap: 16px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  align-items: flex-start;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.targetText {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 500;
+  text-align: left;
+}
+
+.checkIcon {
+  color: #c9a227;
+  font-weight: bold;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.orgInfo {
+  text-align: center;
+  padding: 40px;
+  background: #fff;
+  border-top: 1px solid #eee;
+  color: #555;
+  line-height: 1.8;
+}
+
+@media (max-width: 768px) {
+  .mvContainer, .goalsContainer {
+    flex-direction: column;
+  }
+  
+  .targetList {
+    grid-template-columns: 1fr;
   }
 }
