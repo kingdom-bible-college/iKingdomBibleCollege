@@ -6,18 +6,21 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link href="/" className={styles.logo}>
-          ✝️ Kingdom Bible College
+          KINGDOM BIBLE COLLEGE
         </Link>
         
         <nav className={styles.nav}>
           <Link href="/" className={styles.navLink}>
             홈
           </Link>
+          <Link href="/about" className={styles.navLink}>
+            KBC 소개
+          </Link>
           <Link href="/courses" className={styles.navLink}>
             강의
           </Link>
-          <Link href="/about" className={styles.navLink}>
-            소개
+          <Link href="/contact" className={styles.navLink}>
+            문의
           </Link>
         </nav>
       </div>

@@ -5,69 +5,69 @@ export default function Home() {
     <main className={styles.main}>
       {/* Hero Section */}
       <section className={styles.hero}>
+        <div className={styles.heroOverlay}></div>
         <div className={styles.heroContent}>
           <h1 className={styles.title}>
-            말씀으로 세워지는<br />
-            <span className={styles.highlight}>Kingdom Bible College</span>
+            KINGDOM<br />
+            BIBLE<br />
+            COLLEGE
           </h1>
-          <p className={styles.subtitle}>
-            하나님 나라의 일꾼을 세우는 온라인 성경 대학입니다.
-            체계적인 성경 공부와 신학 강의를 통해 믿음의 깊이를 더하세요.
+          <button className={styles.heroBtn}>KBC 소개</button>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className={styles.about}>
+        <div className={styles.emblem}>🏛️</div>
+        <p className={styles.aboutLabel}>• 킹덤바이블칼리지 소개 •</p>
+        <div className={styles.aboutContent}>
+          <p>
+            KINGDOM BIBLE COLLEGE는 <strong>성경, 상담, 영성, 선교</strong><br />
+            4개의 단과대학으로 구성되어 있으며 24개 과목을 18주 동안 집중 강의합니다.
           </p>
-          <div className={styles.ctaButtons}>
-            <button className={styles.primaryBtn}>강의 둘러보기</button>
-            <button className={styles.secondaryBtn}>무료 체험하기</button>
+          <p>
+            국내 사역 현장 그리고 해외 단기 선교 실습으로 구성된 새로운 시대의 영성과<br />
+            현장성을 겸비한 사도행전적 사역자를 양성하는데 그 목적이 있습니다.
+          </p>
+        </div>
+      </section>
+
+      {/* Colleges Section */}
+      <section className={styles.colleges}>
+        <div className={styles.collegeCard} style={{backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("https://images.unsplash.com/photo-1504052434569-70ad5836ab65?w=400")'}}>
+          <div className={styles.collegeInfo}>
+            <h3>BIBLE<br />COLLEGE</h3>
+            <div className={styles.divider}></div>
+            <span className={styles.collegeKr}>성경</span>
           </div>
         </div>
-        <div className={styles.heroVisual}>
-          <div className={styles.floatingCard}>
-            <span className={styles.cardIcon}>📖</span>
-            <span>성경 강의</span>
+        <div className={styles.collegeCard} style={{backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=400")'}}>
+          <div className={styles.collegeInfo}>
+            <h3>COUNSELING<br />COLLEGE</h3>
+            <div className={styles.divider}></div>
+            <span className={styles.collegeKr}>상담</span>
           </div>
-          <div className={styles.floatingCard}>
-            <span className={styles.cardIcon}>✝️</span>
-            <span>신학 과정</span>
+        </div>
+        <div className={styles.collegeCard} style={{backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("https://images.unsplash.com/photo-1507692049790-de58290a4334?w=400")'}}>
+          <div className={styles.collegeInfo}>
+            <h3>SPIRITUALITY<br />COLLEGE</h3>
+            <div className={styles.divider}></div>
+            <span className={styles.collegeKr}>영성</span>
           </div>
-          <div className={styles.floatingCard}>
-            <span className={styles.cardIcon}>🙏</span>
-            <span>경건 훈련</span>
+        </div>
+        <div className={styles.collegeCard} style={{backgroundImage: 'linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url("https://images.unsplash.com/photo-1526778548025-fa2f459cd5c1?w=400")'}}>
+          <div className={styles.collegeInfo}>
+            <h3>MISSION FIELD<br />COLLEGE</h3>
+            <div className={styles.divider}></div>
+            <span className={styles.collegeKr}>선교</span>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className={styles.features}>
-        <h2 className={styles.sectionTitle}>왜 Kingdom Bible College인가요?</h2>
-        <div className={styles.featureGrid}>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>📱</div>
-            <h3>언제 어디서나</h3>
-            <p>모바일, 태블릿, PC 어디서든 말씀을 공부하세요.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>📚</div>
-            <h3>체계적인 커리큘럼</h3>
-            <p>구약부터 신약까지, 단계별 성경 공부 과정을 제공합니다.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>�‍🏫</div>
-            <h3>전문 강사진</h3>
-            <p>신학교 출신 목사님과 전문 사역자들의 강의를 들으세요.</p>
-          </div>
-          <div className={styles.featureCard}>
-            <div className={styles.featureIcon}>📜</div>
-            <h3>수료증 발급</h3>
-            <p>각 과정 수료 시 공식 수료증을 발급받으세요.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className={styles.cta}>
-        <h2>지금 바로 시작하세요</h2>
-        <p>첫 달 무료로 모든 강의를 수강할 수 있습니다.</p>
-        <button className={styles.primaryBtn}>무료로 시작하기</button>
-      </section>
+      {/* Footer */}
+      <footer className={styles.footer}>
+        <div className={styles.footerLogo}>🏛️ KINGDOM BIBLE COLLEGE</div>
+      </footer>
     </main>
   );
 }
