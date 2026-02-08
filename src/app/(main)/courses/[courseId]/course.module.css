@@ -1,0 +1,484 @@
+.main {
+  min-height: 100vh;
+  background: #f5f6f8;
+  color: #1f2937;
+  --primary: #00b87c;
+  --primary-dark: #009866;
+  --border: #e5e7eb;
+  --muted: #6b7280;
+  --card: #ffffff;
+}
+
+.hero {
+  background: linear-gradient(180deg, #ffffff 0%, #f3f5f8 100%);
+  padding: 120px 24px 60px;
+  border-bottom: 1px solid var(--border);
+}
+
+.heroInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 36px;
+  align-items: center;
+}
+
+.heroInfo {
+  display: grid;
+  gap: 16px;
+}
+
+.breadcrumb {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.heroTitle {
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.heroSubtitle {
+  font-size: 1.05rem;
+  color: #374151;
+  line-height: 1.7;
+}
+
+.heroMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.badgePrimary {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(0, 184, 124, 0.12);
+  color: var(--primary-dark);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.resourceRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.resourceLabel {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.resourceTags {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.resourceTag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eef2f7;
+  font-size: 0.8rem;
+  color: #4b5563;
+}
+
+.heroVideo {
+  display: grid;
+  gap: 12px;
+}
+
+.videoFrame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: #0f172a;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.2);
+}
+
+.videoFrame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.videoNotice {
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.content {
+  padding: 40px 24px 100px;
+}
+
+.contentInner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  font-size: 0.95rem;
+  color: var(--muted);
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.tabActive {
+  color: #111827;
+  font-weight: 600;
+  border-bottom: 2px solid var(--primary);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.sectionSub {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.inlineTag {
+  display: inline-flex;
+  margin-left: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #374151;
+  font-size: 0.75rem;
+}
+
+.sectionActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.sectionTotal {
+  font-size: 0.9rem;
+  color: #111827;
+  font-weight: 600;
+}
+
+.expandButton {
+  padding: 6px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.sectionList {
+  display: grid;
+  gap: 12px;
+}
+
+.sectionCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.sectionSummary {
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  position: relative;
+}
+
+.sectionSummary::marker {
+  display: none;
+}
+
+.sectionSummary::after {
+  content: "▾";
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.sectionCard[open] .sectionSummary::after {
+  content: "▴";
+}
+
+.sectionCount {
+  color: var(--muted);
+  font-weight: 500;
+  margin-right: 20px;
+}
+
+.lessonList {
+  border-top: 1px solid var(--border);
+}
+
+.lessonRow {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.92rem;
+  color: #111827;
+  transition: background 0.2s ease;
+}
+
+.lessonRow:last-child {
+  border-bottom: none;
+}
+
+.lessonRow:hover {
+  background: #f8fafc;
+}
+
+.emptyState {
+  padding: 32px;
+  border: 1px dashed var(--border);
+  border-radius: 14px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.emptyTitle {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: #111827;
+}
+
+.emptyDesc {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.lessonTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lessonIndex {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.previewBadge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(0, 184, 124, 0.12);
+  color: var(--primary-dark);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.fileBadge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.lessonMeta {
+  color: var(--muted);
+}
+
+.sidebar {
+  position: relative;
+}
+
+.stickyCard {
+  position: sticky;
+  top: 100px;
+  display: grid;
+  gap: 18px;
+}
+
+.enrollCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+}
+
+.approvalBadge {
+  display: inline-flex;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.enrollTitle {
+  font-size: 1.15rem;
+  margin: 0 0 6px;
+}
+
+.enrollDesc {
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.primaryBtn {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  background: var(--primary);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.primaryBtn:hover {
+  background: var(--primary-dark);
+}
+
+.secondaryBtn {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: #111827;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.enrollMeta {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.enrollMeta div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.enrollMeta strong {
+  color: #111827;
+  font-weight: 600;
+}
+
+.noticeCard {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.noticeCard h4 {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 1rem;
+}
+
+.noticeCard ul {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: #374151;
+}
+
+.noticeCard li {
+  margin-bottom: 6px;
+}
+
+@media (max-width: 1024px) {
+  .heroInner {
+    grid-template-columns: 1fr;
+  }
+
+  .contentInner {
+    grid-template-columns: 1fr;
+  }
+
+  .stickyCard {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    padding-top: 100px;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sectionSummary {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sectionSummary::after {
+    right: 16px;
+  }
+
+  .lessonRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
