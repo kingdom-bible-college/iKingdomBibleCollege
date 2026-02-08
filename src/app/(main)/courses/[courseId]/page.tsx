@@ -8,6 +8,7 @@ import {
 } from "../courseData";
 import { getVimeoVideos } from "@/lib/vimeo";
 import { buildCourseGroups, buildCurriculum } from "../courseUtils";
+import { requireUser } from "@/lib/auth/session";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -19,6 +20,7 @@ type PageProps = {
 };
 
 export default async function CourseDetailPage({ params }: PageProps) {
+  await requireUser();
   const resolvedParams = await params;
   const videos = await getVimeoVideos();
   const courseGroups = buildCourseGroups(videos);

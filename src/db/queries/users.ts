@@ -20,6 +20,16 @@ export async function getUserByEmail(email: string) {
   return result[0] ?? null;
 }
 
+export async function getApprovedUserByEmail(email: string) {
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email));
+  const user = result[0] ?? null;
+  if (!user || user.status !== 'approved') return null;
+  return user;
+}
+
 export async function createUser(data: NewUser) {
   const result = await db.insert(users).values(data).returning();
   return result[0];

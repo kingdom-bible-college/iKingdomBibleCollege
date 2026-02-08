@@ -4,7 +4,9 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.9);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(12px);
   transition: background 0.3s ease;
 }
 
@@ -22,7 +24,7 @@
   font-size: 1rem;
   font-weight: 400;
   letter-spacing: 0.2em;
-  color: #fff;
+  color: #111827;
   text-decoration: none;
   transition: opacity 0.2s;
 }
@@ -37,7 +39,7 @@
 }
 
 .navLink {
-  color: rgba(255, 255, 255, 0.85);
+  color: #374151;
   text-decoration: none;
   font-size: 0.9rem;
   font-weight: 400;
@@ -46,7 +48,28 @@
 }
 
 .navLink:hover {
-  color: #fff;
+  color: #111827;
+}
+
+.navCta {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 24, 39, 0.25);
+  background: rgba(17, 24, 39, 0.06);
+  color: #111827;
+}
+
+.navButton {
+  cursor: pointer;
+  font: inherit;
+  border: 1px solid rgba(17, 24, 39, 0.25);
+  background: rgba(17, 24, 39, 0.06);
+  line-height: 1;
+}
+
+.navCta:hover {
+  background: rgba(17, 24, 39, 0.12);
+  color: #111827;
 }
 
 @media (max-width: 768px) {

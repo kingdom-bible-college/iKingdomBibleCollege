@@ -3,6 +3,7 @@ import { Manrope } from "next/font/google";
 import styles from "./list.module.css";
 import { getVimeoVideos } from "@/lib/vimeo";
 import { buildCourseGroups } from "./courseUtils";
+import { requireUser } from "@/lib/auth/session";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -10,6 +11,7 @@ const bodyFont = Manrope({
 });
 
 export default async function CoursesListPage() {
+  await requireUser();
   const videos = await getVimeoVideos();
   const courseGroups = buildCourseGroups(videos);
 
