@@ -4,6 +4,10 @@ import styles from "./list.module.css";
 import { getVimeoVideos } from "@/lib/vimeo";
 import { buildCourseGroups } from "./courseUtils";
 import { requireUser } from "@/lib/auth/session";
+import { getCourses } from "@/db/queries/courses";
+import { getCourseVideoOrdersByCourseIds } from "@/db/queries/courseVideoOrders";
+import { courseCatalog, defaultCourseMeta } from "./courseData";
+import { formatTotalDuration } from "@/lib/time";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -13,7 +17,54 @@ const bodyFont = Manrope({
 export default async function CoursesListPage() {
   await requireUser();
   const videos = await getVimeoVideos();
-  const courseGroups = buildCourseGroups(videos);
+  const courseRows = await getCourses();
+  const activeCourses = courseRows.filter((course) => course.status === "active");
+  const orderRows = await getCourseVideoOrdersByCourseIds(
+    activeCourses.map((course) => course.id)
+  );
+  const orderMap = new Map<number, string[]>();
+  orderRows.forEach((row) => {
+    if (!orderMap.has(row.courseId)) {
+      orderMap.set(row.courseId, []);
+    }
+    orderMap.get(row.courseId)?.push(row.vimeoId);
+  });
+  const videoMap = new Map(videos.map((video) => [video.id, video]));
+
+  const manualGroups = activeCourses.map((course) => {
+    const orderedIds = orderMap.get(course.id) ?? [];
+    const selectedVideos = orderedIds
+      .map((id) => videoMap.get(id))
+      .filter((video): video is NonNullable<typeof video> => Boolean(video));
+    const totalSeconds = selectedVideos.reduce(
+      (sum, video) => sum + (Number.isFinite(video.duration) ? video.duration : 0),
+      0
+    );
+    const totalDuration = formatTotalDuration(totalSeconds);
+    const coverImage =
+      selectedVideos.find((video) => video.thumbnail)?.thumbnail ?? null;
+
+    return {
+      slug: course.slug,
+      title: course.title,
+      meta: {
+        ...defaultCourseMeta,
+        title: course.title,
+        subtitle: course.subtitle || defaultCourseMeta.subtitle,
+        instructor: course.instructor || defaultCourseMeta.instructor,
+        level: course.level || defaultCourseMeta.level,
+        lastUpdated: course.lastUpdated || defaultCourseMeta.lastUpdated,
+        heroVimeoId: course.heroVimeoId || defaultCourseMeta.heroVimeoId,
+      },
+      videos: selectedVideos,
+      totalLectures: selectedVideos.length,
+      totalDuration,
+      coverImage,
+    };
+  });
+
+  const courseGroups =
+    activeCourses.length > 0 ? manualGroups : buildCourseGroups(videos, courseCatalog);
 
   return (
     <main className={`${styles.main} ${bodyFont.className}`}>

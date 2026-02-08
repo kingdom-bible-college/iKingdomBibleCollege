@@ -11,6 +11,11 @@ export type VimeoVideo = {
   thumbnail: string | null;
 };
 
+export type VimeoProject = {
+  id: string;
+  name: string;
+};
+
 type VimeoPicture = {
   base_link?: string;
   sizes?: Array<{ link?: string }>;
@@ -25,6 +30,18 @@ type VimeoApiVideo = {
   pictures?: VimeoPicture | null;
 };
 
+type VimeoApiProject = {
+  uri?: string;
+  name?: string;
+};
+
+type VimeoPagedResponse = {
+  data?: unknown[];
+  paging?: {
+    next?: string | null;
+  };
+};
+
 const getThumbnail = (pictures?: VimeoPicture | null): string | null => {
   if (!pictures) return null;
   if (pictures.base_link) return pictures.base_link;
@@ -33,6 +50,12 @@ const getThumbnail = (pictures?: VimeoPicture | null): string | null => {
 };
 
 const parseVideoId = (uri?: string): string => {
+  if (!uri) return "";
+  const parts = uri.split("/");
+  return parts[parts.length - 1] ?? "";
+};
+
+const parseProjectId = (uri?: string): string => {
   if (!uri) return "";
   const parts = uri.split("/");
   return parts[parts.length - 1] ?? "";
@@ -65,15 +88,34 @@ const fetchVimeo = async (path: string) => {
   return response.json();
 };
 
-export const getVimeoVideos = async (): Promise<VimeoVideo[]> => {
+const fetchPaged = async (pathBase: string) => {
   const perPage = Number(process.env.VIMEO_PER_PAGE || "50");
-  const data = await fetchVimeo(
-    `/me/videos?per_page=${perPage}&sort=date&direction=desc`
-  );
+  const maxPages = Number(process.env.VIMEO_MAX_PAGES || "50");
+  const all: unknown[] = [];
 
-  if (!data || !Array.isArray(data.data)) return [];
+  let page = 1;
+  while (page <= maxPages) {
+    const data = (await fetchVimeo(
+      `${pathBase}?per_page=${perPage}&page=${page}&sort=date&direction=desc`
+    )) as VimeoPagedResponse | null;
 
-  return (data.data as VimeoApiVideo[]).map((video) => ({
+    if (!data || !Array.isArray(data.data)) break;
+
+    all.push(...data.data);
+
+    const hasNext = Boolean(data.paging?.next);
+    if (!hasNext || data.data.length < perPage) break;
+
+    page += 1;
+  }
+
+  return all;
+};
+
+export const getVimeoVideos = async (): Promise<VimeoVideo[]> => {
+  const all = (await fetchPaged("/me/videos")) as VimeoApiVideo[];
+
+  return all.map((video) => ({
     id: parseVideoId(video.uri),
     title: video.name ?? "Untitled",
     duration: Number(video.duration ?? 0),
@@ -81,6 +123,54 @@ export const getVimeoVideos = async (): Promise<VimeoVideo[]> => {
     link: video.link ?? null,
     thumbnail: getThumbnail(video.pictures),
   }));
+};
+
+export const getVimeoProjectVideos = async (
+  projectId: string
+): Promise<VimeoVideo[]> => {
+  if (!projectId) return [];
+  const all = (await fetchPaged(
+    `/me/projects/${projectId}/videos`
+  )) as VimeoApiVideo[];
+
+  return all.map((video) => ({
+    id: parseVideoId(video.uri),
+    title: video.name ?? "Untitled",
+    duration: Number(video.duration ?? 0),
+    description: video.description ?? null,
+    link: video.link ?? null,
+    thumbnail: getThumbnail(video.pictures),
+  }));
+};
+
+export const getVimeoProjects = async (): Promise<VimeoProject[]> => {
+  const perPage = Number(process.env.VIMEO_PER_PAGE || "50");
+  const maxPages = Number(process.env.VIMEO_MAX_PAGES || "50");
+  const all: VimeoApiProject[] = [];
+
+  let page = 1;
+  while (page <= maxPages) {
+    const data = (await fetchVimeo(
+      `/me/projects?per_page=${perPage}&page=${page}`
+    )) as VimeoPagedResponse | null;
+
+    if (!data || !Array.isArray(data.data)) break;
+
+    const batch = data.data as VimeoApiProject[];
+    all.push(...batch);
+
+    const hasNext = Boolean(data.paging?.next);
+    if (!hasNext || batch.length < perPage) break;
+
+    page += 1;
+  }
+
+  return all
+    .map((project) => ({
+      id: parseProjectId(project.uri),
+      name: project.name ?? "Untitled",
+    }))
+    .filter((project) => project.id);
 };
 
 export const getVimeoVideoById = async (

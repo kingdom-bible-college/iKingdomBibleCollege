@@ -7,7 +7,7 @@ import styles from "./adminLayout.module.css";
 const navItems = [
   { href: "/admin", label: "대시보드" },
   { href: "/admin/users", label: "회원 승인" },
-  { href: "/admin/courses", label: "강의 관리", disabled: true },
+  { href: "/admin/courses", label: "강의 관리" },
   { href: "/admin/announcements", label: "공지 관리", disabled: true },
 ];
 

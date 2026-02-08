@@ -15,6 +15,20 @@
       "when": 1770545537226,
       "tag": "0001_new_zuras",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770553873828,
+      "tag": "0002_worthless_chamber",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770555967850,
+      "tag": "0003_spotty_maelstrom",
+      "breakpoints": true
     }
   ]
 }

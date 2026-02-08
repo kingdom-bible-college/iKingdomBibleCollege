@@ -83,7 +83,104 @@ const ensureUniqueSlug = (slug: string, counts: Map<string, number>) => {
   return current === 0 ? slug : `${slug}-${current + 1}`;
 };
 
-export const buildCourseGroups = (videos: VimeoVideo[]): CourseGroup[] => {
+export const orderVideosByIds = (
+  videos: VimeoVideo[],
+  orderedIds: string[]
+) => {
+  if (!orderedIds.length) return videos;
+  const orderIndex = new Map<string, number>(
+    orderedIds.map((id, index) => [id, index])
+  );
+  return videos
+    .map((video, index) => ({
+      video,
+      index,
+      order: orderIndex.get(video.id),
+    }))
+    .sort((a, b) => {
+      if (a.order === undefined && b.order === undefined) {
+        return a.index - b.index;
+      }
+      if (a.order === undefined) return 1;
+      if (b.order === undefined) return -1;
+      return a.order - b.order;
+    })
+    .map((item) => item.video);
+};
+
+const matchVideoTitle = (title: string, match: CourseMatch) =>
+  isMatch(title, match);
+
+const buildGroup = (
+  meta: CourseMeta,
+  items: VimeoVideo[],
+  index: number,
+  slugCounts: Map<string, number>
+): CourseGroup => {
+  const baseSlug =
+    meta.slug ?? (toSlug(meta.title) || `course-${index + 1}`);
+  const slug = ensureUniqueSlug(baseSlug, slugCounts);
+
+  const totalSeconds = items.reduce(
+    (sum, video) => sum + (Number.isFinite(video.duration) ? video.duration : 0),
+    0
+  );
+
+  const totalDuration =
+    totalSeconds > 0 ? formatTotalDuration(totalSeconds) : "0분";
+
+  const coverImage =
+    items.find((video) => video.thumbnail)?.thumbnail ?? null;
+
+  return {
+    slug,
+    title: meta.title,
+    meta,
+    videos: items,
+    totalLectures: items.length,
+    totalDuration,
+    coverImage,
+  };
+};
+
+export const buildCourseGroups = (
+  videos: VimeoVideo[],
+  catalogOverride?: CourseMeta[]
+): CourseGroup[] => {
+  const catalog =
+    catalogOverride && catalogOverride.length ? catalogOverride : courseCatalog;
+
+  if (catalogOverride && catalogOverride.length) {
+    const slugCounts = new Map<string, number>();
+    const used = new Set<string>();
+    const groups = catalog.map((meta, index) => {
+      const match =
+        meta.match ?? ({ type: "prefix", value: meta.title } as CourseMatch);
+      const items = videos.filter(
+        (video) => !used.has(video.id) && matchVideoTitle(video.title, match)
+      );
+      items.forEach((video) => used.add(video.id));
+      const mergedMeta: CourseMeta = { ...defaultCourseMeta, ...meta };
+      return buildGroup(mergedMeta, items, index, slugCounts);
+    });
+
+    const remaining = videos.filter((video) => !used.has(video.id));
+    if (remaining.length) {
+      const otherMeta: CourseMeta = {
+        ...defaultCourseMeta,
+        title: "기타",
+        subtitle: "아직 분류되지 않은 강의입니다.",
+        instructor: "담당 강사",
+        level: "입문 - 초급",
+        lastUpdated: defaultCourseMeta.lastUpdated,
+        match: { type: "contains", value: "" },
+      };
+      groups.push(buildGroup(otherMeta, remaining, groups.length, slugCounts));
+    }
+
+    return groups;
+  }
+
   const grouped = new Map<string, VimeoVideo[]>();
   const order: string[] = [];
 
@@ -101,36 +198,12 @@ export const buildCourseGroups = (videos: VimeoVideo[]): CourseGroup[] => {
   return order.map((title, index) => {
     const items = grouped.get(title) ?? [];
     const meta = findCourseMeta(title);
-    const baseSlug =
-      meta?.slug ?? (toSlug(title) || `course-${index + 1}`);
-    const slug = ensureUniqueSlug(baseSlug, slugCounts);
-
-    const totalSeconds = items.reduce(
-      (sum, video) => sum + (Number.isFinite(video.duration) ? video.duration : 0),
-      0
-    );
-
-    const totalDuration =
-      totalSeconds > 0 ? formatTotalDuration(totalSeconds) : "0분";
-
-    const coverImage =
-      items.find((video) => video.thumbnail)?.thumbnail ?? null;
-
     const mergedMeta: CourseMeta = {
       ...defaultCourseMeta,
       ...meta,
       title: meta?.title ?? title,
     };
-
-    return {
-      slug,
-      title: mergedMeta.title,
-      meta: mergedMeta,
-      videos: items,
-      totalLectures: items.length,
-      totalDuration,
-      coverImage,
-    };
+    return buildGroup(mergedMeta, items, index, slugCounts);
   });
 };
 
