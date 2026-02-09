@@ -16,8 +16,10 @@ const bodyFont = Manrope({
 
 export default async function CoursesListPage() {
   await requireUser();
-  const videos = await getVimeoVideos();
-  const courseRows = await getCourses();
+  const [videos, courseRows] = await Promise.all([
+    getVimeoVideos(),
+    getCourses(),
+  ]);
   const activeCourses = courseRows.filter((course) => course.status === "active");
   const orderRows = await getCourseVideoOrdersByCourseIds(
     activeCourses.map((course) => course.id)

@@ -28,14 +28,14 @@ export async function Header() {
           {user ? (
             <form action="/api/auth/logout" method="post">
               <button
-                className={`${styles.navLink} ${styles.navCta} ${styles.navButton}`}
+                className={`${styles.navLink} ${styles.navButton}`}
                 type="submit"
               >
                 로그아웃
               </button>
             </form>
           ) : (
-            <Link href="/login" className={`${styles.navLink} ${styles.navCta}`}>
+            <Link href="/login" className={styles.navLink}>
               로그인
             </Link>
           )}

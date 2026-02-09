@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import styles from "./lesson.module.css";
 import { Manrope } from "next/font/google";
 import {
@@ -8,9 +9,8 @@ import {
 import { getVimeoVideos } from "@/lib/vimeo";
 import { buildCourseGroups, buildCurriculum } from "../../courseUtils";
 import { requireUser } from "@/lib/auth/session";
-import { getCourses } from "@/db/queries/courses";
+import { getCourseBySlug } from "@/db/queries/courses";
 import { getCourseVideoOrdersByCourseIds } from "@/db/queries/courseVideoOrders";
-import { formatTotalDuration } from "@/lib/time";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -23,66 +23,45 @@ type PageProps = {
 
 export default async function LessonDetailPage({ params }: PageProps) {
   await requireUser();
-  const resolvedParams = await params;
+  const { courseId, lessonId } = await params;
+  const slug = decodeURIComponent(courseId);
   const videos = await getVimeoVideos();
-  const courseRows = await getCourses();
-  const activeCourses = courseRows.filter((course) => course.status === "active");
-  const orderRows = await getCourseVideoOrdersByCourseIds(
-    activeCourses.map((course) => course.id)
-  );
-  const orderMap = new Map<number, string[]>();
-  orderRows.forEach((row) => {
-    if (!orderMap.has(row.courseId)) {
-      orderMap.set(row.courseId, []);
-    }
-    orderMap.get(row.courseId)?.push(row.vimeoId);
-  });
   const videoMap = new Map(videos.map((video) => [video.id, video]));
 
-  const manualGroups = activeCourses.map((course) => {
-    const orderedIds = orderMap.get(course.id) ?? [];
-    const selectedVideos = orderedIds
+  const courseRow = await getCourseBySlug(slug);
+
+  let course = defaultCourseMeta;
+  let activeVideos: typeof videos = [];
+  let activeCourseSlug = slug;
+
+  if (courseRow) {
+    const orderRows = await getCourseVideoOrdersByCourseIds([courseRow.id]);
+    const orderedIds = orderRows.map((row) => row.vimeoId);
+    activeVideos = orderedIds
       .map((id) => videoMap.get(id))
       .filter((video): video is NonNullable<typeof video> => Boolean(video));
-    const totalSeconds = selectedVideos.reduce(
-      (sum, video) => sum + (Number.isFinite(video.duration) ? video.duration : 0),
-      0
-    );
-    const totalDuration = formatTotalDuration(totalSeconds);
-    const coverImage =
-      selectedVideos.find((video) => video.thumbnail)?.thumbnail ?? null;
-
-    return {
-      slug: course.slug,
-      title: course.title,
-      meta: {
-        ...defaultCourseMeta,
-        title: course.title,
-        subtitle: course.subtitle || defaultCourseMeta.subtitle,
-        instructor: course.instructor || defaultCourseMeta.instructor,
-        level: course.level || defaultCourseMeta.level,
-        lastUpdated: course.lastUpdated || defaultCourseMeta.lastUpdated,
-        heroVimeoId: course.heroVimeoId || defaultCourseMeta.heroVimeoId,
-      },
-      videos: selectedVideos,
-      totalLectures: selectedVideos.length,
-      totalDuration,
-      coverImage,
+    activeCourseSlug = courseRow.slug;
+    course = {
+      ...defaultCourseMeta,
+      title: courseRow.title,
+      subtitle: courseRow.subtitle || defaultCourseMeta.subtitle,
+      instructor: courseRow.instructor || defaultCourseMeta.instructor,
+      level: courseRow.level || defaultCourseMeta.level,
+      lastUpdated: courseRow.lastUpdated || defaultCourseMeta.lastUpdated,
+      heroVimeoId: courseRow.heroVimeoId || defaultCourseMeta.heroVimeoId,
     };
-  });
+  } else {
+    const courseGroups = buildCourseGroups(videos, courseCatalog);
+    const activeGroup = courseGroups.find((group) => group.slug === slug);
+    if (!activeGroup) notFound();
+    course = activeGroup.meta;
+    activeVideos = activeGroup.videos;
+    activeCourseSlug = activeGroup.slug;
+  }
 
-  const courseGroups =
-    activeCourses.length > 0
-      ? manualGroups
-      : buildCourseGroups(videos, courseCatalog);
-  const activeGroup =
-    courseGroups.find((group) => group.slug === resolvedParams.courseId) ??
-    courseGroups[0];
-  const course = activeGroup?.meta ?? defaultCourseMeta;
-  const activeVideos = activeGroup ? activeGroup.videos : [];
   const { curriculum, totalLectures, heroVideoId, hasVimeo } =
     buildCurriculum(activeVideos, course.heroVimeoId);
-  const coursePath = `/courses/${activeGroup?.slug ?? resolvedParams.courseId}`;
+  const coursePath = `/courses/${activeCourseSlug}`;
 
   const allLessons = curriculum.flatMap((section) => section.lessons);
 
@@ -116,7 +95,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
   }
 
   const currentLesson =
-    allLessons.find((lesson) => lesson.id === resolvedParams.lessonId) ??
+    allLessons.find((lesson) => lesson.id === lessonId) ??
     allLessons[0];
 
   const currentIndex = Math.max(

@@ -51,25 +51,13 @@
   color: #111827;
 }
 
-.navCta {
-  padding: 8px 16px;
-  border-radius: 999px;
-  border: 1px solid rgba(17, 24, 39, 0.25);
-  background: rgba(17, 24, 39, 0.06);
-  color: #111827;
-}
-
 .navButton {
   cursor: pointer;
   font: inherit;
-  border: 1px solid rgba(17, 24, 39, 0.25);
-  background: rgba(17, 24, 39, 0.06);
-  line-height: 1;
-}
-
-.navCta:hover {
-  background: rgba(17, 24, 39, 0.12);
-  color: #111827;
+  border: none;
+  background: none;
+  padding: 0;
+  line-height: inherit;
 }
 
 @media (max-width: 768px) {
