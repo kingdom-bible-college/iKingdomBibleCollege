@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import Link from "next/link";
 import { requireAdmin } from "@/lib/auth/session";
 import {
@@ -21,6 +22,7 @@ import AdminCoursesClient, {
 } from "./adminCoursesClient";
 import { formatLessonDuration } from "@/lib/time";
 import AdminVideoPicker from "./adminVideoPicker";
+import SubmitButton from "./submitButton";
 
 const toSlug = (value: string) =>
   value
@@ -70,6 +72,7 @@ const createCourseAction = async (formData: FormData) => {
 
   revalidatePath("/admin/courses");
   revalidatePath("/courses");
+  redirect("/admin/courses?view=added");
 };
 
 type PageProps = {
@@ -83,14 +86,18 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
   const selectedProjectId = resolvedSearch.project ?? "all";
   const view = resolvedSearch.view === "added" ? "added" : "add";
 
+  const courseRows = await getCourses();
+
+  // "추가된 강의" 탭에서는 프로젝트/폴더 API만 건너뛰어 속도 개선
+  const needsPicker = view === "add";
   const [videos, projects, projectVideos] = await Promise.all([
     getVimeoVideos(),
-    getVimeoProjects(),
-    selectedProjectId !== "all"
+    needsPicker ? getVimeoProjects() : Promise.resolve([]),
+    needsPicker && selectedProjectId !== "all"
       ? getVimeoProjectVideos(selectedProjectId)
       : Promise.resolve([]),
   ]);
-  const courseRows = await getCourses();
+
   const orderRows = await getCourseVideoOrdersByCourseIds(
     courseRows.map((course) => course.id)
   );
@@ -238,9 +245,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
               />
             </div>
             <div className={styles.formActions}>
-              <button className={styles.primaryButton} type="submit">
-                강의 등록
-              </button>
+              <SubmitButton />
             </div>
           </form>
         </div>

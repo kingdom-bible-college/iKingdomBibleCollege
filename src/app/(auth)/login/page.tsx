@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "../auth.module.css";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
@@ -36,7 +36,7 @@ export default function LoginPage() {
           const messages = Object.values(data.error)
             .flat()
             .filter(Boolean);
-          setError(messages[0] || "로그인에 실패했습니다.");
+          setError(String(messages[0] || "로그인에 실패했습니다."));
         } else {
           setError("로그인에 실패했습니다.");
         }
@@ -109,5 +109,13 @@ export default function LoginPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   );
 }
