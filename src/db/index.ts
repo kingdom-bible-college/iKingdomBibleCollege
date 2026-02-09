@@ -6,9 +6,9 @@ let _db: ReturnType<typeof drizzle>;
 
 function getDb() {
   if (!_db) {
-    const connectionString = process.env.DATABASE_URL;
+    const connectionString = process.env.KBC_DATABASE_URL;
     if (!connectionString) {
-      throw new Error('DATABASE_URL is not set');
+      throw new Error('KBC_DATABASE_URL is not set');
     }
     sql = neon(connectionString);
     _db = drizzle(sql);

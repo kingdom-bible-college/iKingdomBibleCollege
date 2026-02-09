@@ -35,7 +35,7 @@ export default function SignupPage() {
           const messages = Object.values(data.error)
             .flat()
             .filter(Boolean);
-          setError(String(messages[0] || "회원가입에 실패했습니다."));
+          setError(String(messages[0]) || "회원가입에 실패했습니다.");
         } else {
           setError("회원가입에 실패했습니다.");
         }

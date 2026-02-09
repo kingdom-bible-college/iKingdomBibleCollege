@@ -36,7 +36,7 @@ function LoginForm() {
           const messages = Object.values(data.error)
             .flat()
             .filter(Boolean);
-          setError(String(messages[0] || "로그인에 실패했습니다."));
+          setError(String(messages[0]) || "로그인에 실패했습니다.");
         } else {
           setError("로그인에 실패했습니다.");
         }
