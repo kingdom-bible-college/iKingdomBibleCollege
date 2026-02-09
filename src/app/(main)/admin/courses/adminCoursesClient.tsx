@@ -12,9 +12,6 @@ type VideoItem = {
 export type AdminCourseItem = {
   id: number;
   title: string;
-  subtitle: string;
-  matchType: string;
-  matchValue: string;
   status: string;
   totalLectures: number;
   videos: VideoItem[];
@@ -143,7 +140,6 @@ export default function AdminCoursesClient({
     <div className={styles.table}>
       <div className={styles.rowHeader}>
         <span>강의명</span>
-        <span>매칭</span>
         <span>영상 수</span>
         <span>상태</span>
         <span>액션</span>
@@ -156,10 +152,6 @@ export default function AdminCoursesClient({
       </div>
 
       {courses.map((course) => {
-        const matchLabel =
-          course.matchType === "manual" ? "직접 선택" : course.matchType;
-        const matchValue =
-          course.matchType === "manual" ? "선택된 영상" : course.matchValue;
         return (
           <div
             key={course.id}
@@ -187,11 +179,6 @@ export default function AdminCoursesClient({
             </div>
             <div>
               <strong>{course.title}</strong>
-              <p>{course.subtitle || "설명 없음"}</p>
-            </div>
-            <div>
-              <span>{matchLabel}</span>
-              <strong>{matchValue}</strong>
             </div>
             <div>{course.totalLectures}개</div>
             <div>{course.status}</div>

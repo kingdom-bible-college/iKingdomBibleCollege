@@ -36,8 +36,7 @@ const createCourseAction = async (formData: FormData) => {
   const title = String(formData.get("title") || "").trim();
   if (!title) return;
 
-  const slugInput = String(formData.get("slug") || "").trim();
-  const baseSlug = slugInput ? toSlug(slugInput) : toSlug(title);
+  const baseSlug = toSlug(title);
   let slug = baseSlug;
   let attempt = 1;
   while (await getCourseBySlug(slug)) {
@@ -45,11 +44,6 @@ const createCourseAction = async (formData: FormData) => {
     attempt += 1;
   }
 
-  const subtitle = String(formData.get("subtitle") || "").trim();
-  const instructor = String(formData.get("instructor") || "").trim();
-  const level = String(formData.get("level") || "").trim();
-  const lastUpdated = String(formData.get("lastUpdated") || "").trim();
-  const heroVimeoId = String(formData.get("heroVimeoId") || "").trim();
   const selectedRaw = String(formData.get("selectedVideoIds") || "[]");
   let selectedIds: string[] = [];
   try {
@@ -64,11 +58,6 @@ const createCourseAction = async (formData: FormData) => {
   const created = await createCourse({
     title,
     slug,
-    subtitle,
-    instructor,
-    level,
-    lastUpdated,
-    heroVimeoId: heroVimeoId || null,
     matchType: "manual",
     matchValue: title,
     status: "active",
@@ -121,12 +110,6 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     return {
       id: course.id,
       title: course.title,
-      subtitle: course.subtitle || "설명 없음",
-      matchType: course.matchType || "manual",
-      matchValue:
-        course.matchType === "manual" || !course.matchType
-          ? "직접 선택"
-          : course.matchValue || course.title,
       status: course.status,
       totalLectures: selectedVideos.length,
       videos: selectedVideos.map((video) => ({
@@ -239,37 +222,9 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
             </span>
           </form>
           <form className={styles.form} action={createCourseAction}>
-            <label className={styles.field}>
+            <label className={`${styles.field} ${styles.fullRow}`}>
               <span>강의명</span>
               <input name="title" required placeholder="예: 포스트인카운터" />
-            </label>
-            <label className={styles.field}>
-              <span>슬러그 (선택)</span>
-              <input name="slug" placeholder="post-encounter" />
-            </label>
-            <label className={styles.field}>
-              <span>강사</span>
-              <input name="instructor" placeholder="황성은 목사" />
-            </label>
-            <label className={styles.field}>
-              <span>난이도</span>
-              <input name="level" placeholder="입문 - 초급" />
-            </label>
-            <label className={styles.field}>
-              <span>업데이트</span>
-              <input name="lastUpdated" placeholder="2026.02.01" />
-            </label>
-            <label className={styles.field}>
-              <span>히어로 Vimeo ID (선택)</span>
-              <input name="heroVimeoId" placeholder="76979871" />
-            </label>
-            <label className={`${styles.field} ${styles.fullRow}`}>
-              <span>강의 소개</span>
-              <textarea
-                name="subtitle"
-                rows={3}
-                placeholder="강의 설명을 입력하세요."
-              />
             </label>
             <div className={styles.fullRow}>
               <p className={styles.projectHint}>

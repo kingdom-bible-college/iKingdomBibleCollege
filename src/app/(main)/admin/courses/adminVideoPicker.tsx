@@ -19,6 +19,7 @@ export default function AdminVideoPicker({
 }) {
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -37,10 +38,31 @@ export default function AdminVideoPicker({
     });
   };
 
+  const removeVideo = (id: string) => {
+    setSelectedIds((prev) => prev.filter((item) => item !== id));
+  };
+
   const selectedVideos = useMemo(
-    () => selectedIds.map((id) => videos.find((v) => v.id === id)).filter(Boolean),
+    () =>
+      selectedIds
+        .map((id) => videos.find((v) => v.id === id))
+        .filter((v): v is PickerVideo => Boolean(v)),
     [selectedIds, videos]
   );
+
+  const handleDrop = (targetId: string) => {
+    if (draggingId === null || draggingId === targetId) return;
+    setSelectedIds((prev) => {
+      const fromIndex = prev.indexOf(draggingId);
+      const toIndex = prev.indexOf(targetId);
+      if (fromIndex < 0 || toIndex < 0) return prev;
+      const updated = [...prev];
+      const [item] = updated.splice(fromIndex, 1);
+      updated.splice(toIndex, 0, item);
+      return updated;
+    });
+    setDraggingId(null);
+  };
 
   return (
     <div className={styles.videoPicker}>
@@ -56,51 +78,84 @@ export default function AdminVideoPicker({
         />
       </div>
 
-      <div className={styles.videoPickerGrid}>
-        <div className={styles.videoPickerList}>
-          {filtered.map((video) => {
-            const active = selectedIds.includes(video.id);
-            return (
-              <button
-                key={video.id}
-                type="button"
-                className={`${styles.videoPickerItem} ${
-                  active ? styles.videoPickerItemActive : ""
-                }`}
-                onClick={() => toggleVideo(video.id)}
-              >
-                <div>
-                  <strong>{video.title}</strong>
-                  <span>{video.durationLabel}</span>
-                </div>
-                <em>{active ? "제거" : "추가"}</em>
-              </button>
-            );
-          })}
-        </div>
+      <div className={styles.videoPickerList}>
+        {filtered.map((video) => {
+          const checked = selectedIds.includes(video.id);
+          return (
+            <label
+              key={video.id}
+              className={`${styles.videoPickerItem} ${
+                checked ? styles.videoPickerItemActive : ""
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={checked}
+                onChange={() => toggleVideo(video.id)}
+                className={styles.videoCheckbox}
+              />
+              <div>
+                <strong>{video.title}</strong>
+                <span>{video.durationLabel}</span>
+              </div>
+            </label>
+          );
+        })}
+      </div>
 
-        <div className={styles.videoPickerSelected}>
-          <p>선택된 영상</p>
-          {selectedVideos.length ? (
-            <ul>
-              {selectedVideos.map((video) => (
-                <li key={video!.id}>
-                  <span>{video!.title}</span>
-                  <button
-                    type="button"
-                    onClick={() => toggleVideo(video!.id)}
-                  >
-                    삭제
-                  </button>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className={styles.matchListEmpty}>
-              아직 선택된 영상이 없습니다.
-            </div>
-          )}
-        </div>
+      <div className={styles.videoPickerSelected}>
+        <p>선택된 영상 순서 (드래그해서 순서 변경)</p>
+        {selectedVideos.length ? (
+          <div className={styles.videoList}>
+            {selectedVideos.map((video) => (
+              <div
+                key={video.id}
+                className={`${styles.videoItem} ${
+                  draggingId === video.id ? styles.videoDragging : ""
+                }`}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  handleDrop(video.id);
+                }}
+              >
+                <button
+                  type="button"
+                  className={styles.dragHandle}
+                  draggable
+                  onDragStart={(event) => {
+                    event.dataTransfer.effectAllowed = "move";
+                    event.stopPropagation();
+                    setDraggingId(video.id);
+                  }}
+                  onDragEnd={() => setDraggingId(null)}
+                  aria-label="영상 순서 변경"
+                >
+                  ⋮⋮
+                </button>
+                <span className={styles.videoTitle}>{video.title}</span>
+                <span className={styles.videoDuration}>
+                  {video.durationLabel}
+                </span>
+                <button
+                  type="button"
+                  className={styles.videoRemoveButton}
+                  onClick={() => removeVideo(video.id)}
+                >
+                  제거
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className={styles.matchListEmpty}>
+            아직 선택된 영상이 없습니다.
+          </div>
+        )}
       </div>
 
       <input

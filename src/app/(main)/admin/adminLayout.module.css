@@ -1,71 +1,88 @@
 .layout {
   min-height: 100vh;
+  padding-top: 73px;
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 260px 1fr;
   background: #f6f7fb;
   color: #1f2937;
 }
 
 .sidebar {
-  padding: 32px 24px;
+  position: sticky;
+  top: 73px;
+  height: calc(100vh - 73px);
+  padding: 28px 20px;
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 24px;
+  overflow-y: auto;
+}
+
+.brand {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .brandEyebrow {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
   color: #94a3b8;
-  margin: 0 0 10px;
+  margin: 0 0 6px;
 }
 
 .brandTitle {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.15rem;
   font-weight: 700;
+  color: #111827;
 }
 
 .navLabel {
-  font-size: 0.85rem;
-  color: #64748b;
-  margin-bottom: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  margin-bottom: 8px;
 }
 
 .nav {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 4px;
 }
 
 .navItem {
-  padding: 12px 14px;
-  border-radius: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
   text-decoration: none;
-  color: #1f2937;
-  font-weight: 600;
+  color: #4b5563;
+  font-size: 0.9rem;
+  font-weight: 500;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #f8fafc;
-  transition: background 0.2s ease, transform 0.2s ease;
+  background: transparent;
+  transition: background 0.15s ease, color 0.15s ease;
 }
 
 .navItem:hover {
-  background: #eef2ff;
-  transform: translateX(2px);
+  background: #f1f5f9;
+  color: #111827;
 }
 
 .navItemActive {
   background: #111827;
   color: #fff;
+  font-weight: 600;
 }
 
 .navItemActive:hover {
-  background: #111827;
+  background: #1f2937;
+  color: #fff;
 }
 
 .navItemDisabled {
@@ -84,33 +101,53 @@
 
 .sidebarFooter {
   margin-top: auto;
+  padding-top: 20px;
+  border-top: 1px solid #f1f5f9;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .footerLink {
   text-decoration: none;
-  color: #475569;
-  font-weight: 600;
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 10px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.footerLink:hover {
+  background: #f1f5f9;
+  color: #111827;
 }
 
 .logoutButton {
   border: none;
-  background: #fee2e2;
-  color: #b91c1c;
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: 600;
+  background: transparent;
+  color: #dc2626;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
   cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease;
+}
+
+.logoutButton:hover {
+  background: #fef2f2;
 }
 
 .content {
   padding: 40px 48px 80px;
+  overflow-y: auto;
 }
 
 .contentInner {
   max-width: 1100px;
+  margin: 0 auto;
 }
 
 @media (max-width: 1024px) {
@@ -120,7 +157,8 @@
 
   .sidebar {
     position: sticky;
-    top: 72px;
+    top: 73px;
+    height: auto;
     z-index: 10;
     flex-direction: row;
     align-items: center;
@@ -130,6 +168,10 @@
     overflow-x: auto;
   }
 
+  .brand {
+    display: none;
+  }
+
   .nav {
     flex-direction: row;
     flex-wrap: nowrap;
@@ -137,6 +179,10 @@
 
   .navItem {
     white-space: nowrap;
+  }
+
+  .sidebarFooter {
+    display: none;
   }
 }
 
