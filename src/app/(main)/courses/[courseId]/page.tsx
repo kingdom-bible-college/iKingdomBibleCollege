@@ -6,7 +6,7 @@ import {
   defaultCourseMeta,
   courseCatalog,
 } from "../courseData";
-import { getVimeoVideos } from "@/lib/vimeo";
+import { getVimeoVideos, getVimeoVideosByIds } from "@/lib/vimeo";
 import { buildCourseGroups, buildCurriculum } from "../courseUtils";
 import { requireUser } from "@/lib/auth/session";
 import { getCourseBySlug } from "@/db/queries/courses";
@@ -22,23 +22,25 @@ type PageProps = {
 };
 
 export default async function CourseDetailPage({ params }: PageProps) {
-  await requireUser();
   const { courseId } = await params;
   const slug = decodeURIComponent(courseId);
-  const videos = await getVimeoVideos();
-  const videoMap = new Map(videos.map((video) => [video.id, video]));
 
-  // 1) DB에서 slug로 직접 조회
-  const courseRow = await getCourseBySlug(slug);
+  // 1) 인증 + DB 조회 병렬 실행
+  const [, courseRow] = await Promise.all([
+    requireUser(),
+    getCourseBySlug(slug),
+  ]);
 
   let course = defaultCourseMeta;
-  let activeVideos: typeof videos = [];
+  let activeVideos: Awaited<ReturnType<typeof getVimeoVideos>> = [];
   let activeCourseId = slug;
 
   if (courseRow) {
-    // DB 강의 → 해당 강의의 비디오만 로드
+    // DB 강의 → 필요한 비디오 ID만 조회 후 병렬 fetch
     const orderRows = await getCourseVideoOrdersByCourseIds([courseRow.id]);
     const orderedIds = orderRows.map((row) => row.vimeoId);
+    const fetchedVideos = await getVimeoVideosByIds(orderedIds);
+    const videoMap = new Map(fetchedVideos.map((v) => [v.id, v]));
     activeVideos = orderedIds
       .map((id) => videoMap.get(id))
       .filter((video): video is NonNullable<typeof video> => Boolean(video));
@@ -53,7 +55,8 @@ export default async function CourseDetailPage({ params }: PageProps) {
       heroVimeoId: courseRow.heroVimeoId || defaultCourseMeta.heroVimeoId,
     };
   } else {
-    // 2) DB에 없으면 catalog 기반 폴백
+    // 2) DB에 없으면 catalog 기반 폴백 (전체 영상 필요)
+    const videos = await getVimeoVideos();
     const courseGroups = buildCourseGroups(videos, courseCatalog);
     const activeGroup = courseGroups.find((group) => group.slug === slug);
     if (!activeGroup) notFound();

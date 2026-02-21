@@ -183,6 +183,14 @@ export const getVimeoProjects = async (): Promise<VimeoProject[]> => {
     .filter((project) => project.id);
 };
 
+export const getVimeoVideosByIds = async (
+  ids: string[]
+): Promise<VimeoVideo[]> => {
+  if (!ids.length) return [];
+  const results = await Promise.all(ids.map((id) => getVimeoVideoById(id)));
+  return results.filter((v): v is VimeoVideo => v !== null);
+};
+
 export const getVimeoVideoById = async (
   id: string
 ): Promise<VimeoVideo | null> => {
