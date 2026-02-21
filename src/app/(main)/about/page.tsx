@@ -6,10 +6,10 @@ import styles from './page.module.css';
 type MenuType = 'recommendation' | 'greeting' | 'introduction' | 'admission' | 'partners';
 
 const menuItems: { id: MenuType; title: string }[] = [
-  { id: 'recommendation', title: '이사장 · 자문위원 추천사' },
+  { id: 'recommendation', title: '추천사' },
   { id: 'greeting', title: '학장 인사' },
-  { id: 'introduction', title: 'KBC 소개' },
-  { id: 'admission', title: '2026학년도 모집요강' },
+  { id: 'introduction', title: '커리큘럼' },
+  { id: 'admission', title: '모집요강' },
   { id: 'partners', title: '협력기관(MOU) 현황' },
 ];
 
@@ -60,7 +60,7 @@ export default function AboutPage() {
           {/* 이사장 · 자문위원 추천사 */}
           {activeMenu === 'recommendation' && (
             <div className={styles.contentSection}>
-              <h2 className={styles.contentTitle}>이사장 · 자문위원 추천사</h2>
+              <h2 className={styles.contentTitle}>추천사</h2>
               
               {/* 이사장 추천사 */}
               <div className={styles.recommendCard}>
@@ -190,7 +190,7 @@ export default function AboutPage() {
           {/* KBC 소개 */}
           {activeMenu === 'introduction' && (
             <div className={styles.contentSection}>
-              <h2 className={styles.contentTitle}>KBC 소개</h2>
+              <h2 className={styles.contentTitle}>커리큘럼</h2>
               
               {/* 1. Main Vision / Slogan */}
               <div className={styles.introHeader}>
@@ -335,7 +335,7 @@ export default function AboutPage() {
           {/* 2026학년도 모집요강 */}
           {activeMenu === 'admission' && (
             <div className={styles.contentSection}>
-              <h2 className={styles.contentTitle}>2026학년도 모집요강</h2>
+              <h2 className={styles.contentTitle}>모집요강</h2>
               
               {/* 1. 학사 일정 및 등록 안내 */}
               <div className={styles.admissionGroup}>

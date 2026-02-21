@@ -22,8 +22,8 @@ export async function Header() {
           <Link href="/courses" className={styles.navLink}>
             강의
           </Link>
-          <Link href="/contact" className={styles.navLink}>
-            문의
+          <Link href="/faq" className={styles.navLink}>
+            FAQ
           </Link>
           {user ? (
             <form action="/api/auth/logout" method="post">
