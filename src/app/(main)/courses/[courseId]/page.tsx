@@ -73,7 +73,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
       <section className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroInfo}>
-            <p className={styles.breadcrumb}>강의 &gt; 리더십 트랙</p>
+            <p className={styles.breadcrumb}>강의 &gt; {course.title}</p>
             <h1 className={styles.heroTitle}>{course.title}</h1>
             <p className={styles.heroSubtitle}>{course.subtitle}</p>
           </div>
@@ -170,11 +170,11 @@ export default async function CourseDetailPage({ params }: PageProps) {
               <div className={styles.noticeCard}>
                 <h4>학습 안내</h4>
                 <p>
-                  수강 승인 후 강의 자료와 Q&A 공간이 제공됩니다. 학습 진행 중
-                  문의가 있으면 담당자에게 바로 요청하세요.
+                  본 강의는 영상 시청과 함께 학습 자료가 제공됩니다.
+                  궁금한 점은 담당자에게 언제든 문의해 주세요.
                 </p>
                 <ul>
-                  <li>승인된 회원만 전체 영상 열람</li>
+                  <li>전체 강의 영상 무제한 시청</li>
                   <li>학습 자료 상시 다운로드</li>
                   <li>질문/피드백 세션 제공</li>
                 </ul>

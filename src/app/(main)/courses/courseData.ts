@@ -16,8 +16,9 @@ export type CourseMeta = {
 
 export const defaultCourseMeta: CourseMeta = {
   title: "강의",
-  subtitle: "강의 소개를 입력해 주세요.",
-  instructor: "담당 강사",
+  subtitle:
+    "하나님의 말씀을 깊이 묵상하고, 삶에 적용하는 체계적인 성경 훈련 과정입니다.",
+  instructor: "킹덤바이블칼리지",
   level: "입문 - 초급",
   lastUpdated: "2026.02.01",
   heroVimeoId: "76979871",
