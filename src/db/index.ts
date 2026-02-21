@@ -1,7 +1,6 @@
-import { drizzle } from 'drizzle-orm/neon-http';
-import { neon, NeonQueryFunction } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
 
-let sql: NeonQueryFunction<false, false>;
 let _db: ReturnType<typeof drizzle>;
 
 function getDb() {
@@ -10,8 +9,8 @@ function getDb() {
     if (!connectionString) {
       throw new Error('KBC_DATABASE_URL is not set');
     }
-    sql = neon(connectionString);
-    _db = drizzle(sql);
+    const client = postgres(connectionString, { prepare: false, max: 1, idle_timeout: 20 });
+    _db = drizzle(client);
   }
   return _db;
 }

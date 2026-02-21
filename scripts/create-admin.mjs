@@ -1,5 +1,5 @@
 import { config } from "dotenv";
-import { neon } from "@neondatabase/serverless";
+import postgres from "postgres";
 import { randomBytes, scryptSync } from "crypto";
 
 config({ path: ".env.local" });
@@ -17,7 +17,7 @@ if (!connectionString) {
   throw new Error("Database URL is not set in .env.local");
 }
 
-const sql = neon(connectionString);
+const sql = postgres(connectionString);
 
 const salt = randomBytes(16);
 const derived = scryptSync(password, salt, 64);
@@ -48,3 +48,5 @@ if (existing.length) {
 }
 
 console.log(`Password set to: ${password}`);
+
+await sql.end();
