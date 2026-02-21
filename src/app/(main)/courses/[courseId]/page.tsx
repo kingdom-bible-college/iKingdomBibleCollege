@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import styles from "./course.module.css";
 import { Manrope } from "next/font/google";
 import {
-  resources,
   defaultCourseMeta,
   courseCatalog,
 } from "../courseData";
@@ -77,16 +76,6 @@ export default async function CourseDetailPage({ params }: PageProps) {
             <p className={styles.breadcrumb}>강의 &gt; 리더십 트랙</p>
             <h1 className={styles.heroTitle}>{course.title}</h1>
             <p className={styles.heroSubtitle}>{course.subtitle}</p>
-            <div className={styles.resourceRow}>
-              <span className={styles.resourceLabel}>제공 자료</span>
-              <div className={styles.resourceTags}>
-                {resources.map((item) => (
-                  <span key={item} className={styles.resourceTag}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
           </div>
 
           <div className={styles.heroVideo}>
