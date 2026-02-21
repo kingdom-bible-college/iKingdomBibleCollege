@@ -4,7 +4,6 @@ import styles from "./course.module.css";
 import { Manrope } from "next/font/google";
 import {
   resources,
-  tabs,
   defaultCourseMeta,
   courseCatalog,
 } from "../courseData";
@@ -78,12 +77,6 @@ export default async function CourseDetailPage({ params }: PageProps) {
             <p className={styles.breadcrumb}>강의 &gt; 리더십 트랙</p>
             <h1 className={styles.heroTitle}>{course.title}</h1>
             <p className={styles.heroSubtitle}>{course.subtitle}</p>
-            <div className={styles.heroMeta}>
-              <span className={styles.badgePrimary}>회원 전용</span>
-              <span className={styles.metaItem}>강사: {course.instructor}</span>
-              <span className={styles.metaItem}>난이도: {course.level}</span>
-              <span className={styles.metaItem}>업데이트: {course.lastUpdated}</span>
-            </div>
             <div className={styles.resourceRow}>
               <span className={styles.resourceLabel}>제공 자료</span>
               <div className={styles.resourceTags}>
@@ -116,18 +109,6 @@ export default async function CourseDetailPage({ params }: PageProps) {
       <section className={styles.content}>
         <div className={styles.contentInner}>
           <div className={styles.curriculum}>
-            <div className={styles.tabs}>
-              {tabs.map((tab, index) => (
-                <button
-                  key={tab}
-                  type="button"
-                  className={`${styles.tab} ${index === 0 ? styles.tabActive : ""}`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
-
             <div className={styles.sectionHeader}>
               <div>
                 <h2 className={styles.sectionTitle}>커리큘럼</h2>
@@ -200,27 +181,6 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
           <aside className={styles.sidebar}>
             <div className={styles.stickyCard}>
-              <div className={styles.enrollCard}>
-                <div className={styles.enrollMeta}>
-                  <div>
-                    <span>강사</span>
-                    <strong>{course.instructor}</strong>
-                  </div>
-                  <div>
-                    <span>수업 구성</span>
-                    <strong>{totalLectures}개 강의</strong>
-                  </div>
-                  <div>
-                    <span>총 학습 시간</span>
-                    <strong>{totalDuration}</strong>
-                  </div>
-                  <div>
-                    <span>난이도</span>
-                    <strong>{course.level}</strong>
-                  </div>
-                </div>
-              </div>
-
               <div className={styles.noticeCard}>
                 <h4>학습 안내</h4>
                 <p>
