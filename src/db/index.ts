@@ -9,7 +9,7 @@ function getDb() {
     if (!connectionString) {
       throw new Error('KBC_DATABASE_URL is not set');
     }
-    const client = postgres(connectionString, { prepare: false, max: 1, idle_timeout: 20 });
+    const client = postgres(connectionString, { prepare: false, max: 10, idle_timeout: 20 });
     _db = drizzle(client);
   }
   return _db;
