@@ -9,6 +9,7 @@ export type VimeoVideo = {
   description: string | null;
   link: string | null;
   thumbnail: string | null;
+  hash: string | null;
 };
 
 export type VimeoProject = {
@@ -53,6 +54,13 @@ const parseVideoId = (uri?: string): string => {
   if (!uri) return "";
   const parts = uri.split("/");
   return parts[parts.length - 1] ?? "";
+};
+
+const parseHash = (link?: string | null): string | null => {
+  if (!link) return null;
+  const parts = link.split("/");
+  const last = parts[parts.length - 1] ?? "";
+  return /^[a-f0-9]+$/i.test(last) ? last : null;
 };
 
 const parseProjectId = (uri?: string): string => {
@@ -122,6 +130,7 @@ export const getVimeoVideos = async (): Promise<VimeoVideo[]> => {
     description: video.description ?? null,
     link: video.link ?? null,
     thumbnail: getThumbnail(video.pictures),
+    hash: parseHash(video.link),
   }));
 };
 
@@ -140,6 +149,7 @@ export const getVimeoProjectVideos = async (
     description: video.description ?? null,
     link: video.link ?? null,
     thumbnail: getThumbnail(video.pictures),
+    hash: parseHash(video.link),
   }));
 };
 
@@ -188,5 +198,6 @@ export const getVimeoVideoById = async (
     description: video.description ?? null,
     link: video.link ?? null,
     thumbnail: getThumbnail(video.pictures),
+    hash: parseHash(video.link),
   };
 };

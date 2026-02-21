@@ -107,6 +107,9 @@ export default async function LessonDetailPage({ params }: PageProps) {
   const nextLesson = allLessons[currentIndex + 1];
   const prevLesson = allLessons[currentIndex - 1];
   const videoId = hasVimeo ? currentLesson.id : heroVideoId;
+  const hashMap = new Map(activeVideos.map((v) => [v.id, v.hash]));
+  const videoHash = hashMap.get(videoId);
+  const videoEmbedSrc = `https://player.vimeo.com/video/${videoId}${videoHash ? `?h=${videoHash}&` : '?'}title=0&byline=0&portrait=0`;
 
   return (
     <main className={`${styles.main} ${bodyFont.className}`}>
@@ -131,7 +134,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
         <section className={styles.playerPanel}>
           <div className={styles.playerFrame}>
             <iframe
-              src={`https://player.vimeo.com/video/${videoId}?title=0&byline=0&portrait=0`}
+              src={videoEmbedSrc}
               title={course.title}
               allow="autoplay; fullscreen; picture-in-picture"
               loading="lazy"

@@ -66,6 +66,9 @@ export default async function CourseDetailPage({ params }: PageProps) {
 
   const { curriculum, totalLectures, totalDuration, heroVideoId, hasVimeo } =
     buildCurriculum(activeVideos, course.heroVimeoId);
+  const hashMap = new Map(activeVideos.map((v) => [v.id, v.hash]));
+  const heroHash = hashMap.get(heroVideoId);
+  const heroEmbedSrc = `https://player.vimeo.com/video/${heroVideoId}${heroHash ? `?h=${heroHash}&` : '?'}title=0&byline=0&portrait=0`;
 
   return (
     <main className={`${styles.main} ${bodyFont.className}`}>
@@ -96,7 +99,7 @@ export default async function CourseDetailPage({ params }: PageProps) {
           <div className={styles.heroVideo}>
             <div className={styles.videoFrame}>
               <iframe
-                src={`https://player.vimeo.com/video/${heroVideoId}?title=0&byline=0&portrait=0`}
+                src={heroEmbedSrc}
                 title={course.title}
                 allow="autoplay; fullscreen; picture-in-picture"
                 loading="lazy"
