@@ -88,9 +88,6 @@ export default async function CourseDetailPage({ params }: PageProps) {
                 allowFullScreen
               />
             </div>
-            <div className={styles.videoNotice}>
-              승인된 회원만 전체 강의를 시청할 수 있습니다.
-            </div>
           </div>
         </div>
       </section>
