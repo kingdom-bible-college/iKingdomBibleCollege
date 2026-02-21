@@ -225,7 +225,7 @@ export const buildCurriculum = (
     id: video.id,
     title: video.title,
     duration: formatLessonDuration(video.duration),
-    preview: index < 2,
+    preview: false,
   }));
 
   const totalSeconds = videos.reduce(

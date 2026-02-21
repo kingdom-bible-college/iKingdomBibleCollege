@@ -174,9 +174,6 @@ export default async function CourseDetailPage({ params }: PageProps) {
                               {lessonIndex + 1}.
                             </span>
                             <span>{lesson.title}</span>
-                            {lesson.preview && (
-                              <span className={styles.previewBadge}>미리보기</span>
-                            )}
                             {lesson.type === "자료" && (
                               <span className={styles.fileBadge}>자료</span>
                             )}
@@ -204,18 +201,6 @@ export default async function CourseDetailPage({ params }: PageProps) {
           <aside className={styles.sidebar}>
             <div className={styles.stickyCard}>
               <div className={styles.enrollCard}>
-                <span className={styles.approvalBadge}>회원 승인 필요</span>
-                <h3 className={styles.enrollTitle}>승인된 계정만 시청 가능</h3>
-                <p className={styles.enrollDesc}>
-                  강의 신청 후 운영진 승인 완료 시 모든 Vimeo 강의를
-                  시청할 수 있습니다.
-                </p>
-                <button type="button" className={styles.primaryBtn}>
-                  승인 요청하기
-                </button>
-                <button type="button" className={styles.secondaryBtn}>
-                  문의하기
-                </button>
                 <div className={styles.enrollMeta}>
                   <div>
                     <span>강사</span>
