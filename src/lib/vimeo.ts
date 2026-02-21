@@ -85,7 +85,7 @@ const fetchVimeo = async (path: string) => {
 
   const response = await fetch(`${VIMEO_API_BASE}${path}`, {
     headers,
-    next: { revalidate: 60 },
+    next: { revalidate: 300 },
   });
 
   if (!response.ok) {
