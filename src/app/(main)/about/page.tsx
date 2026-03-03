@@ -70,7 +70,7 @@ export default function AboutPage() {
                     <img src="/이영환.png" alt="이영환 목사" className={styles.profileImage} />
                     <div className={styles.profileInfo}>
                       <strong>이영환 목사</strong>
-                      <span>한빛제일교회 원로 / 강사사역원 대표</span>
+                      <span>한밭제일교회 원로 / 강사사역원 대표</span>
                     </div>
                   </div>
                   <div className={styles.recommendText}>
@@ -104,7 +104,7 @@ export default function AboutPage() {
                     <img src="/김상복 목사.png" alt="김상복 목사" className={styles.profileImage} />
                     <div className={styles.profileInfo}>
                       <strong>김상복 목사</strong>
-                      <span>세계복음주의연맹(WEA) 명예회장 / 할렐루야교회 명예총장</span>
+                      <span>세계복음주의연맹(WEA) 명예회장 / 할렐루야교회 원로목사</span>
                     </div>
                   </div>
                   <div className={styles.recommendText}>
