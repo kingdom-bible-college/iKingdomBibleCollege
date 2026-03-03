@@ -160,24 +160,6 @@ export default function Home() {
           </div>
 
           <div className={styles.footerSection}>
-            <h4 className={styles.footerTitle}>단과대학</h4>
-            <ul className={styles.footerLinks}>
-              <li>
-                <a href="#">성경대학</a>
-              </li>
-              <li>
-                <a href="#">상담대학</a>
-              </li>
-              <li>
-                <a href="#">영성대학</a>
-              </li>
-              <li>
-                <a href="#">선교대학</a>
-              </li>
-            </ul>
-          </div>
-
-          <div className={styles.footerSection}>
             <h4 className={styles.footerTitle}>바로가기</h4>
             <ul className={styles.footerLinks}>
               <li>
@@ -198,9 +180,9 @@ export default function Home() {
           <div className={styles.footerSection}>
             <h4 className={styles.footerTitle}>연락처</h4>
             <ul className={styles.footerContact}>
-              <li>📧 info@kingdombible.org</li>
-              <li>📞 02-1234-5678</li>
-              <li>📍 서울특별시 강남구</li>
+              <li>ikingdombiblecollege@gmail.com</li>
+              <li>042-824-3242</li>
+              <li>대전광역시 서구 도안중로 304-10</li>
             </ul>
           </div>
         </div>

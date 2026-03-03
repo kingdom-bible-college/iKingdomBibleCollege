@@ -67,9 +67,9 @@ export default function AboutPage() {
                 <h3 className={styles.recommendSubtitle}>이사장 추천사</h3>
                 <div className={styles.recommendContent}>
                   <div className={styles.profileSection}>
-                    <div className={styles.profileIcon}>👤</div>
+                    <img src="/이영환.png" alt="이영환 목사" className={styles.profileImage} />
                     <div className={styles.profileInfo}>
-                      <strong>이영한 목사</strong>
+                      <strong>이영환 목사</strong>
                       <span>한빛제일교회 원로 / 강사사역원 대표</span>
                     </div>
                   </div>
@@ -92,7 +92,7 @@ export default function AboutPage() {
                       학교에 함께 할 것을 권면하며 기쁨과 행복을 듬뿍 안고 추천합니다.
                     </p>
                   </div>
-                  <p className={styles.signature}>킹덤바이블칼리지 이사장 이영한 목사</p>
+                  <p className={styles.signature}>킹덤바이블칼리지 이사장 이영환 목사</p>
                 </div>
               </div>
 
@@ -101,7 +101,7 @@ export default function AboutPage() {
                 <h3 className={styles.recommendSubtitle}>자문위원 대표 추천사</h3>
                 <div className={styles.recommendContent}>
                   <div className={styles.profileSection}>
-                    <div className={styles.profileIcon}>👤</div>
+                    <img src="/김상복 목사.png" alt="김상복 목사" className={styles.profileImage} />
                     <div className={styles.profileInfo}>
                       <strong>김상복 목사</strong>
                       <span>세계복음주의연맹(WEA) 명예회장 / 할렐루야교회 명예총장</span>

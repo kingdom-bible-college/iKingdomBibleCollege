@@ -165,6 +165,14 @@
   flex-shrink: 0;
 }
 
+.profileImage {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .profileInfo {
   display: flex;
   flex-direction: column;
