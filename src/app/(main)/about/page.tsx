@@ -70,7 +70,7 @@ export default function AboutPage() {
                     <img src="/이영환.png" alt="이영환 목사" className={styles.profileImage} />
                     <div className={styles.profileInfo}>
                       <strong>이영환 목사</strong>
-                      <span>한밭제일교회 원로 / 강사사역원 대표</span>
+                      <span>한밭제일교회 원로 / 장자사역원 대표</span>
                     </div>
                   </div>
                   <div className={styles.recommendText}>
@@ -180,7 +180,13 @@ export default function AboutPage() {
                   
                   <div className={styles.greetingSignature}>
                     <span className={styles.deanName}>킹덤바이블칼리지 학장 황성은 목사</span>
-                    <span className={styles.deanRole}>오메가교회 담임<br />비전스테이션 미니스트리 대표</span>
+                    <span className={styles.deanRole}>
+                      오메가교회 담임목사
+                      <br />
+                      비전스테이션 미니스트리 대표
+                      <br />
+                      KWMA(한국세계선교협의회) 운영이사
+                    </span>
                   </div>
                 </div>
               </div>
@@ -346,8 +352,11 @@ export default function AboutPage() {
                   <ul className={styles.infoList}>
                     <li><strong>등록 마감</strong><span>3월 6일(금)</span></li>
                     <li><strong>개강 예배</strong><span>3월 17일(화) (OT 포함)</span></li>
-                    <li><strong>종강 예배</strong><span>6월 18일(목)</span></li>
+                    <li><strong>종강 예배</strong><span>주일 일정으로 조율 예정</span></li>
                   </ul>
+                  <p className={styles.infoNote}>
+                    * 종강예배 일정은 주일 예배 일정에 맞춰 조율 중이며, 확정 후 안내드립니다.
+                  </p>
                   <p className={styles.infoNote}>
                     * 하반기 실습 훈련: 비정기적 현장 실습 훈련이 7월–10월 중 진행될 예정입니다.
                   </p>
@@ -368,7 +377,7 @@ export default function AboutPage() {
                     <h4 className={styles.boxTitle}>등록 계좌</h4>
                     <ul className={styles.infoList}>
                       <li><strong>국민은행</strong><span>461301-04-610726</span></li>
-                      <li><strong>예금주</strong><span>비전스테이션미니스트리</span></li>
+                      <li><strong>예금주</strong><span>킹덤바이블칼리지</span></li>
                     </ul>
                   </div>
                 </div>
@@ -408,9 +417,9 @@ export default function AboutPage() {
                   <div className={styles.instructorCard}>
                     <div className={styles.profileIcon} style={{width: '60px', height: '60px', fontSize: '2rem'}}>👤</div>
                     <div className={styles.instructorInfo}>
-                      <h5>김태현 목사</h5>
+                      <h5>김태헌 목사</h5>
                       <ul>
-                        <li>오메가교회 선교목사</li>
+                        <li>오메가교회 선교본부장</li>
                         <li>킹덤바이블칼리지 부학장</li>
                       </ul>
                     </div>
@@ -425,7 +434,7 @@ export default function AboutPage() {
                         <th>현장 강의</th>
                         <td>
                           <strong>황성은 목사</strong> (복음 전도와 제자도 / 사도행전적 교회 개척 운동)<br />
-                          <strong>김태현 목사</strong> (이스라엘 선교 / 선교개론)
+                          <strong>김태헌 목사</strong> (이스라엘 선교 / 선교개론)
                         </td>
                       </tr>
                       <tr>
@@ -433,9 +442,9 @@ export default function AboutPage() {
                         <td>
                           <strong>파송 선교사</strong> (특강)<br />
                           <strong>이재환 선교사</strong> (요나선교학교)<br />
-                          <strong>조수아 선교사</strong> (이슬람 선교)<br />
+                          <strong>조슈아 탁 선교사</strong> (이슬람 선교)<br />
                           <strong>윤성철 목사</strong> (예배와 선교)<br />
-                          <strong>함철홍 교수</strong> (요한계시록)
+                          <strong>한철흠 교수</strong> (요한계시록)
                         </td>
                       </tr>
                     </tbody>
@@ -577,7 +586,7 @@ export default function AboutPage() {
                     </div>
                     <div className={styles.partnerBody}>
                       <p>
-                        드림스드림은 학과 없는 재개발국가 및 지역에 학교를 건립·운영하며, 교육을 통해 영성·인성·전문성을 겸비한 글로벌 인재를 양성하는 단체입니다.
+                        드림스드림은 학교 없는 재개발국가 및 지역에 학교를 건립·운영하며, 교육을 통해 영성·인성·전문성을 겸비한 글로벌 인재를 양성하는 단체입니다.
                       </p>
                       <p>
                         전액 장학금 운영과 졸업 후 재능기부 시스템을 통해 모든 학생이 100% 재능기부로 환원하는 구조를 갖추고 있으며,
