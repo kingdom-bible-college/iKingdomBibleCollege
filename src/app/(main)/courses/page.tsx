@@ -91,6 +91,7 @@ export default async function CoursesListPage() {
                 key={group.slug}
                 href={`/courses/${group.slug}`}
                 className={styles.card}
+                prefetch={false}
               >
                 <div className={styles.cover}>
                   {group.coverImage ? (

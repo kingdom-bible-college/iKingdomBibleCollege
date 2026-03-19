@@ -19,7 +19,7 @@ export async function Header() {
           <Link href="/about" className={styles.navLink} prefetch={false}>
             KBC 소개
           </Link>
-          <Link href="/courses" className={styles.navLink} prefetch={false}>
+          <Link href="/courses" className={styles.navLink}>
             강의
           </Link>
           <Link href="/faq" className={styles.navLink} prefetch={false}>
