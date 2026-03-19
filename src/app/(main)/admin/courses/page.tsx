@@ -124,15 +124,9 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     const selectedVideos = orderedIds
       .map((id) => videoMap.get(id))
       .filter((video): video is NonNullable<typeof video> => Boolean(video));
-    const heroVimeoId = selectedVideos.some(
-      (video) => video.id === course.heroVimeoId
-    )
-      ? course.heroVimeoId ?? null
-      : selectedVideos[0]?.id ?? null;
-
     return {
       id: course.id,
-      heroVimeoId,
+      coverImage: course.coverImage ?? null,
       title: course.title,
       status: course.status,
       totalLectures: selectedVideos.length,

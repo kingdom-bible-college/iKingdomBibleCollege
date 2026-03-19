@@ -2,5 +2,11 @@ import { z } from "zod";
 
 export const updateCourseThumbnailSchema = z.object({
   courseId: z.coerce.number().int().positive(),
-  heroVimeoId: z.union([z.string().min(1).max(64), z.null()]),
+  coverImage: z.union([
+    z
+      .string()
+      .startsWith("data:image/")
+      .max(2_000_000),
+    z.null(),
+  ]),
 });

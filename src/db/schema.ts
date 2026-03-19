@@ -37,6 +37,7 @@ export const courses = pgTable('courses', {
   instructor: varchar('instructor', { length: 255 }).notNull().default(''),
   level: varchar('level', { length: 64 }).notNull().default('입문 - 초급'),
   lastUpdated: varchar('last_updated', { length: 32 }).notNull().default(''),
+  coverImage: text('cover_image'),
   heroVimeoId: varchar('hero_vimeo_id', { length: 64 }),
   matchType: varchar('match_type', { length: 16 }).notNull().default('prefix'),
   matchValue: varchar('match_value', { length: 255 }).notNull(),

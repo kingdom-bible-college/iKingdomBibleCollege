@@ -3,6 +3,61 @@
 import { useMemo, useState } from "react";
 import styles from "./adminCourses.module.css";
 
+const MAX_THUMBNAIL_DIMENSION = 1440;
+const THUMBNAIL_OUTPUT_TYPE = "image/jpeg";
+const THUMBNAIL_QUALITY = 0.82;
+
+const readFileAsDataUrl = (file: File) =>
+  new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+        return;
+      }
+      reject(new Error("이미지를 읽을 수 없습니다."));
+    };
+    reader.onerror = () => reject(new Error("이미지를 읽을 수 없습니다."));
+    reader.readAsDataURL(file);
+  });
+
+const loadImage = (src: string) =>
+  new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("이미지를 불러올 수 없습니다."));
+    image.src = src;
+  });
+
+const resizeThumbnail = async (file: File) => {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("이미지 파일만 업로드할 수 있습니다.");
+  }
+
+  const source = await readFileAsDataUrl(file);
+  const image = await loadImage(source);
+  const longestEdge = Math.max(image.width, image.height);
+  const scale =
+    longestEdge > MAX_THUMBNAIL_DIMENSION
+      ? MAX_THUMBNAIL_DIMENSION / longestEdge
+      : 1;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.max(1, Math.round(image.width * scale));
+  canvas.height = Math.max(1, Math.round(image.height * scale));
+
+  const context = canvas.getContext("2d");
+  if (!context) {
+    throw new Error("이미지 처리를 시작할 수 없습니다.");
+  }
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+  return canvas.toDataURL(THUMBNAIL_OUTPUT_TYPE, THUMBNAIL_QUALITY);
+};
+
 type VideoItem = {
   id: string;
   title: string;
@@ -12,7 +67,7 @@ type VideoItem = {
 
 export type AdminCourseItem = {
   id: number;
-  heroVimeoId: string | null;
+  coverImage: string | null;
   title: string;
   status: string;
   totalLectures: number;
@@ -92,14 +147,14 @@ export default function AdminCoursesClient({
     }
   };
 
-  const persistThumbnail = async (courseId: number, heroVimeoId: string) => {
+  const persistThumbnail = async (courseId: number, coverImage: string | null) => {
     setSaving(true);
     setSavedAt(null);
     try {
       const response = await fetch("/api/admin/courses/thumbnail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId, heroVimeoId }),
+        body: JSON.stringify({ courseId, coverImage }),
       });
       if (!response.ok) {
         alert("대표 썸네일 저장에 실패했습니다.");
@@ -151,13 +206,35 @@ export default function AdminCoursesClient({
     setCourses((prev) => prev.filter((course) => course.id !== courseId));
   };
 
-  const handleThumbnailChange = async (courseId: number, heroVimeoId: string) => {
-    const updated = await persistThumbnail(courseId, heroVimeoId);
+  const handleThumbnailUpload = async (courseId: number, file: File | null) => {
+    if (!file) return;
+
+    try {
+      const coverImage = await resizeThumbnail(file);
+      const updated = await persistThumbnail(courseId, coverImage);
+      if (!updated) return;
+
+      setCourses((prev) =>
+        prev.map((course) =>
+          course.id === courseId ? { ...course, coverImage } : course
+        )
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "대표 썸네일 업로드에 실패했습니다.";
+      alert(message);
+    }
+  };
+
+  const handleThumbnailClear = async (courseId: number) => {
+    const updated = await persistThumbnail(courseId, null);
     if (!updated) return;
 
     setCourses((prev) =>
       prev.map((course) =>
-        course.id === courseId ? { ...course, heroVimeoId } : course
+        course.id === courseId ? { ...course, coverImage: null } : course
       )
     );
   };
@@ -186,11 +263,6 @@ export default function AdminCoursesClient({
       </div>
 
       {courses.map((course) => {
-        const currentHeroVideo =
-          course.videos.find((video) => video.id === course.heroVimeoId) ??
-          course.videos[0] ??
-          null;
-
         return (
           <div
             key={course.id}
@@ -235,32 +307,60 @@ export default function AdminCoursesClient({
             <div className={styles.detailHeader}>
               <span>선택된 영상</span>
               <strong>{course.videos.length}개</strong>
-              <em>드래그 순서 변경 · 대표 썸네일 선택</em>
+              <em>드래그해서 순서 변경</em>
             </div>
             <div className={styles.heroPreview}>
               <div className={styles.heroPreviewThumb}>
-                {currentHeroVideo?.thumbnail ? (
+                {course.coverImage ? (
                   <img
-                    src={currentHeroVideo.thumbnail}
+                    src={course.coverImage}
                     alt={`${course.title} 대표 썸네일`}
                     loading="lazy"
                     decoding="async"
                   />
                 ) : (
-                  <div className={styles.heroPreviewFallback}>{course.title}</div>
+                  <div className={styles.heroPreviewFallback}>
+                    대표 썸네일 없음
+                  </div>
                 )}
               </div>
               <div className={styles.heroPreviewInfo}>
                 <span className={styles.heroPreviewLabel}>현재 대표 썸네일</span>
-                <strong>{currentHeroVideo?.title ?? "대표 영상이 없습니다."}</strong>
-                <p>강의 카드와 상세 상단 대표 영상에 사용됩니다.</p>
+                <strong>
+                  {course.coverImage
+                    ? "업로드된 대표 이미지 사용 중"
+                    : "업로드된 대표 이미지가 없습니다."}
+                </strong>
+                <p>강의 카드 목록에 사용됩니다. 16:9 비율 이미지를 권장합니다.</p>
+                <div className={styles.heroPreviewActions}>
+                  <label className={`${styles.ghostButton} ${styles.uploadLabel}`}>
+                    이미지 업로드
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className={styles.hiddenFileInput}
+                      onChange={(event) => {
+                        const file = event.target.files?.[0] ?? null;
+                        void handleThumbnailUpload(course.id, file);
+                        event.currentTarget.value = "";
+                      }}
+                    />
+                  </label>
+                  {course.coverImage ? (
+                    <button
+                      type="button"
+                      className={styles.ghostButton}
+                      onClick={() => void handleThumbnailClear(course.id)}
+                    >
+                      삭제
+                    </button>
+                  ) : null}
+                </div>
               </div>
             </div>
             {course.videos.length ? (
               <div className={styles.videoList}>
                 {course.videos.map((video) => {
-                  const isHero = video.id === course.heroVimeoId;
-
                   return (
                   <div
                     key={video.id}
@@ -311,16 +411,6 @@ export default function AdminCoursesClient({
                         </span>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      className={`${styles.ghostButton} ${
-                        isHero ? styles.heroButtonActive : ""
-                      }`}
-                      onClick={() => void handleThumbnailChange(course.id, video.id)}
-                      disabled={saving && !isHero}
-                    >
-                      {isHero ? "대표 썸네일" : "대표로 설정"}
-                    </button>
                   </div>
                   );
                 })}

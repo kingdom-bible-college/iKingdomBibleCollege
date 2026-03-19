@@ -43,11 +43,9 @@ export default async function CoursesListPage() {
       0
     );
     const totalDuration = formatTotalDuration(totalSeconds);
-    const coverVideo = selectedVideos.find(
-      (video) => video.id === course.heroVimeoId
-    );
     const coverImage =
-      coverVideo?.thumbnail ??
+      course.coverImage ??
+      selectedVideos.find((video) => video.id === course.heroVimeoId)?.thumbnail ??
       selectedVideos.find((video) => video.thumbnail)?.thumbnail ??
       null;
 

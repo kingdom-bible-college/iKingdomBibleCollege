@@ -540,6 +540,25 @@
   color: #64748b;
 }
 
+.heroPreviewActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.uploadLabel {
+  position: relative;
+  overflow: hidden;
+}
+
+.hiddenFileInput {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
 .detailHeader {
   display: flex;
   justify-content: space-between;
@@ -565,7 +584,7 @@
 
 .videoItem {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
@@ -631,12 +650,6 @@
 .videoDuration {
   color: #6b7280;
   white-space: nowrap;
-}
-
-.heroButtonActive {
-  border-color: #0f766e;
-  background: #ccfbf1;
-  color: #115e59;
 }
 
 @media (max-width: 1024px) {
