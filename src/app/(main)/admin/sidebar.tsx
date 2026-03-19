@@ -47,7 +47,12 @@ export default function AdminSidebar() {
               <span className={styles.badge}>준비중</span>
             </span>
           ) : (
-            <Link key={item.href} href={item.href} className={className}>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={className}
+              prefetch={false}
+            >
               {item.label}
             </Link>
           );
@@ -55,7 +60,7 @@ export default function AdminSidebar() {
       </nav>
 
       <div className={styles.sidebarFooter}>
-        <Link href="/courses" className={styles.footerLink}>
+        <Link href="/courses" className={styles.footerLink} prefetch={false}>
           강의 페이지로
         </Link>
         <button className={styles.logoutButton} type="button" onClick={handleLogout}>

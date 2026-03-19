@@ -13,16 +13,16 @@ export async function Header() {
         </Link>
         
         <nav className={styles.nav}>
-          <Link href="/" className={styles.navLink}>
+          <Link href="/" className={styles.navLink} prefetch={false}>
             홈
           </Link>
-          <Link href="/about" className={styles.navLink}>
+          <Link href="/about" className={styles.navLink} prefetch={false}>
             KBC 소개
           </Link>
-          <Link href="/courses" className={styles.navLink}>
+          <Link href="/courses" className={styles.navLink} prefetch={false}>
             강의
           </Link>
-          <Link href="/faq" className={styles.navLink}>
+          <Link href="/faq" className={styles.navLink} prefetch={false}>
             FAQ
           </Link>
           {user ? (
@@ -35,7 +35,7 @@ export async function Header() {
               </button>
             </form>
           ) : (
-            <Link href="/login" className={styles.navLink}>
+            <Link href="/login" className={styles.navLink} prefetch={false}>
               로그인
             </Link>
           )}

@@ -18,12 +18,12 @@ export default async function AdminLandingPage() {
       </div>
 
       <div className={styles.grid}>
-        <Link className={styles.card} href="/admin/users">
+        <Link className={styles.card} href="/admin/users" prefetch={false}>
           <h2>회원 승인</h2>
           <p>승인 대기 목록을 확인하고 접근 권한을 부여합니다.</p>
           <span className={styles.cta}>승인 관리로 이동 →</span>
         </Link>
-        <Link className={styles.card} href="/admin/courses">
+        <Link className={styles.card} href="/admin/courses" prefetch={false}>
           <h2>강의 관리</h2>
           <p>강의 업로드, 섹션 구성, 노출 여부를 관리합니다.</p>
           <span className={styles.cta}>강의 관리로 이동 →</span>

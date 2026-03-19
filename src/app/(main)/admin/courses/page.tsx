@@ -6,6 +6,7 @@ import {
   getVimeoProjectVideos,
   getVimeoProjects,
   getVimeoVideos,
+  getVimeoVideosByIds,
 } from "@/lib/vimeo";
 import {
   createCourse,
@@ -84,23 +85,31 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
 
   const resolvedSearch = (await searchParams) ?? {};
   const selectedProjectId = resolvedSearch.project ?? "all";
-  const view = resolvedSearch.view === "added" ? "added" : "add";
 
   const courseRows = await getCourses();
+  const view =
+    resolvedSearch.view === "add"
+      ? "add"
+      : courseRows.length === 0
+        ? "add"
+        : "added";
 
-  // "추가된 강의" 탭에서는 프로젝트/폴더 API만 건너뛰어 속도 개선
+  const orderRows = await getCourseVideoOrdersByCourseIds(
+    courseRows.map((course) => course.id)
+  );
+  const orderedVideoIds = Array.from(
+    new Set(orderRows.map((row) => row.vimeoId))
+  );
+
   const needsPicker = view === "add";
   const [videos, projects, projectVideos] = await Promise.all([
-    getVimeoVideos(),
+    needsPicker ? getVimeoVideos() : getVimeoVideosByIds(orderedVideoIds),
     needsPicker ? getVimeoProjects() : Promise.resolve([]),
     needsPicker && selectedProjectId !== "all"
       ? getVimeoProjectVideos(selectedProjectId)
       : Promise.resolve([]),
   ]);
 
-  const orderRows = await getCourseVideoOrdersByCourseIds(
-    courseRows.map((course) => course.id)
-  );
   const orderMap = new Map<number, string[]>();
   orderRows.forEach((row) => {
     if (!orderMap.has(row.courseId)) {
@@ -134,7 +143,8 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     durationLabel: formatLessonDuration(video.duration),
     thumbnail: video.thumbnail,
   }));
-  const totalVideos = videos.length;
+  const totalVideos = needsPicker ? videos.length : orderedVideoIds.length;
+  const totalVideosLabel = needsPicker ? "전체 영상" : "등록 영상";
   const selectedProjectName =
     selectedProjectId === "all"
       ? "전체"
@@ -167,7 +177,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
           <strong>{courseRows.length}</strong>
         </div>
         <div>
-          <span>전체 영상</span>
+          <span>{totalVideosLabel}</span>
           <strong>{totalVideos}</strong>
         </div>
       </div>
@@ -186,6 +196,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
           className={`${styles.tabButton} ${
             view === "add" ? styles.tabButtonActive : ""
           }`}
+          prefetch={false}
         >
           강의 추가
         </Link>
@@ -197,6 +208,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
           className={`${styles.tabButton} ${
             view === "added" ? styles.tabButtonActive : ""
           }`}
+          prefetch={false}
         >
           추가된 강의
         </Link>
@@ -240,6 +252,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
                   : `${selectedProjectName} 폴더 영상이 표시됩니다.`}
               </p>
               <AdminVideoPicker
+                key={selectedProjectId}
                 videos={pickerVideos}
                 inputName="selectedVideoIds"
               />

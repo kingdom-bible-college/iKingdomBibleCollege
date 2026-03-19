@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import styles from "./adminCourses.module.css";
 
+const INITIAL_VISIBLE_COUNT = 60;
+
 type PickerVideo = {
   id: string;
   title: string;
@@ -20,6 +22,13 @@ export default function AdminVideoPicker({
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE_COUNT);
+
+  const selectedIdSet = useMemo(() => new Set(selectedIds), [selectedIds]);
+  const videoMap = useMemo(
+    () => new Map(videos.map((video) => [video.id, video])),
+    [videos]
+  );
 
   const filtered = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -28,6 +37,23 @@ export default function AdminVideoPicker({
       video.title.toLowerCase().includes(keyword)
     );
   }, [query, videos]);
+
+  const visibleVideos = useMemo(() => {
+    const selectedMatches: PickerVideo[] = [];
+    const unselectedMatches: PickerVideo[] = [];
+
+    filtered.forEach((video) => {
+      if (selectedIdSet.has(video.id)) {
+        selectedMatches.push(video);
+        return;
+      }
+      unselectedMatches.push(video);
+    });
+
+    return [...selectedMatches, ...unselectedMatches].slice(0, visibleCount);
+  }, [filtered, selectedIdSet, visibleCount]);
+
+  const hiddenCount = Math.max(filtered.length - visibleVideos.length, 0);
 
   const toggleVideo = (id: string) => {
     setSelectedIds((prev) => {
@@ -45,9 +71,9 @@ export default function AdminVideoPicker({
   const selectedVideos = useMemo(
     () =>
       selectedIds
-        .map((id) => videos.find((v) => v.id === id))
+        .map((id) => videoMap.get(id))
         .filter((v): v is PickerVideo => Boolean(v)),
-    [selectedIds, videos]
+    [selectedIds, videoMap]
   );
 
   const handleDrop = (targetId: string) => {
@@ -73,14 +99,17 @@ export default function AdminVideoPicker({
       <div className={styles.videoPickerSearch}>
         <input
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setVisibleCount(INITIAL_VISIBLE_COUNT);
+          }}
           placeholder="영상 제목으로 검색하세요"
         />
       </div>
 
       <div className={styles.videoPickerList}>
-        {filtered.map((video) => {
-          const checked = selectedIds.includes(video.id);
+        {visibleVideos.map((video) => {
+          const checked = selectedIdSet.has(video.id);
           return (
             <label
               key={video.id}
@@ -102,6 +131,23 @@ export default function AdminVideoPicker({
           );
         })}
       </div>
+
+      {hiddenCount > 0 ? (
+        <div className={styles.videoPickerFooter}>
+          <span className={styles.videoPickerSummary}>
+            {filtered.length}개 중 {visibleVideos.length}개 표시
+          </span>
+          <button
+            type="button"
+            className={styles.secondaryButton}
+            onClick={() => {
+              setVisibleCount((prev) => prev + INITIAL_VISIBLE_COUNT);
+            }}
+          >
+            더 보기
+          </button>
+        </div>
+      ) : null}
 
       <div className={styles.videoPickerSelected}>
         <p>선택된 영상 순서 (드래그해서 순서 변경)</p>

@@ -248,6 +248,19 @@
   padding-right: 4px;
 }
 
+.videoPickerFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.videoPickerSummary {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
 .videoPickerItem {
   display: flex;
   align-items: center;
