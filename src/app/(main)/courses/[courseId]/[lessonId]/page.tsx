@@ -6,7 +6,7 @@ import {
   defaultCourseMeta,
   courseCatalog,
 } from "../../courseData";
-import { getVimeoVideos } from "@/lib/vimeo";
+import { getVimeoVideos, getVimeoVideosByIds } from "@/lib/vimeo";
 import { buildCourseGroups, buildCurriculum } from "../../courseUtils";
 import { requireUser } from "@/lib/auth/session";
 import { getCourseBySlug } from "@/db/queries/courses";
@@ -22,21 +22,23 @@ type PageProps = {
 };
 
 export default async function LessonDetailPage({ params }: PageProps) {
-  await requireUser();
   const { courseId, lessonId } = await params;
   const slug = decodeURIComponent(courseId);
-  const videos = await getVimeoVideos();
-  const videoMap = new Map(videos.map((video) => [video.id, video]));
 
-  const courseRow = await getCourseBySlug(slug);
+  const [, courseRow] = await Promise.all([
+    requireUser(),
+    getCourseBySlug(slug),
+  ]);
 
   let course = defaultCourseMeta;
-  let activeVideos: typeof videos = [];
+  let activeVideos: Awaited<ReturnType<typeof getVimeoVideos>> = [];
   let activeCourseSlug = slug;
 
   if (courseRow) {
     const orderRows = await getCourseVideoOrdersByCourseIds([courseRow.id]);
     const orderedIds = orderRows.map((row) => row.vimeoId);
+    const fetchedVideos = await getVimeoVideosByIds(orderedIds);
+    const videoMap = new Map(fetchedVideos.map((video) => [video.id, video]));
     activeVideos = orderedIds
       .map((id) => videoMap.get(id))
       .filter((video): video is NonNullable<typeof video> => Boolean(video));
@@ -51,6 +53,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
       heroVimeoId: courseRow.heroVimeoId || defaultCourseMeta.heroVimeoId,
     };
   } else {
+    const videos = await getVimeoVideos();
     const courseGroups = buildCourseGroups(videos, courseCatalog);
     const activeGroup = courseGroups.find((group) => group.slug === slug);
     if (!activeGroup) notFound();

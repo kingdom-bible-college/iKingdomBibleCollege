@@ -43,11 +43,11 @@ export default async function CoursesListPage() {
       0
     );
     const totalDuration = formatTotalDuration(totalSeconds);
-    const coverImage =
-      course.coverImage ??
-      selectedVideos.find((video) => video.id === course.heroVimeoId)?.thumbnail ??
-      selectedVideos.find((video) => video.thumbnail)?.thumbnail ??
-      null;
+    const coverImage = course.coverImage
+      ? `/api/courses/cover/${encodeURIComponent(course.slug)}?v=${course.updatedAt.getTime()}`
+      : selectedVideos.find((video) => video.id === course.heroVimeoId)?.thumbnail ??
+        selectedVideos.find((video) => video.thumbnail)?.thumbnail ??
+        null;
 
     return {
       slug: course.slug,
