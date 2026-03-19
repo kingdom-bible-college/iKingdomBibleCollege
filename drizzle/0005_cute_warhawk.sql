@@ -1,0 +1,1 @@
+ALTER TABLE "course_video_orders" ADD COLUMN "display_title" text;

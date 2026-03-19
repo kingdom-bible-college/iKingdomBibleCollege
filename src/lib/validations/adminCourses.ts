@@ -10,3 +10,9 @@ export const updateCourseThumbnailSchema = z.object({
     z.null(),
   ]),
 });
+
+export const updateCourseVideoTitleSchema = z.object({
+  courseId: z.coerce.number().int().positive(),
+  vimeoId: z.string().trim().min(1).max(64),
+  displayTitle: z.union([z.string().trim().min(1).max(255), z.null()]),
+});

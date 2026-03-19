@@ -36,12 +36,22 @@ export default async function LessonDetailPage({ params }: PageProps) {
 
   if (courseRow) {
     const orderRows = await getCourseVideoOrdersByCourseIds([courseRow.id]);
+    const displayTitleMap = new Map<string, string>();
+    orderRows.forEach((row) => {
+      if (row.displayTitle) {
+        displayTitleMap.set(row.vimeoId, row.displayTitle);
+      }
+    });
     const orderedIds = orderRows.map((row) => row.vimeoId);
     const fetchedVideos = await getVimeoVideosByIds(orderedIds);
     const videoMap = new Map(fetchedVideos.map((video) => [video.id, video]));
     activeVideos = orderedIds
       .map((id) => videoMap.get(id))
-      .filter((video): video is NonNullable<typeof video> => Boolean(video));
+      .filter((video): video is NonNullable<typeof video> => Boolean(video))
+      .map((video) => ({
+        ...video,
+        title: displayTitleMap.get(video.id) ?? video.title,
+      }));
     activeCourseSlug = courseRow.slug;
     course = {
       ...defaultCourseMeta,

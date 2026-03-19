@@ -56,6 +56,7 @@ export const courseVideoOrders = pgTable('course_video_orders', {
     .notNull()
     .references(() => courses.id, { onDelete: 'cascade' }),
   vimeoId: varchar('vimeo_id', { length: 64 }).notNull(),
+  displayTitle: text('display_title'),
   sortOrder: integer('sort_order').notNull().default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),

@@ -38,12 +38,22 @@ export default async function CourseDetailPage({ params }: PageProps) {
   if (courseRow) {
     // DB 강의 → 필요한 비디오 ID만 조회 후 병렬 fetch
     const orderRows = await getCourseVideoOrdersByCourseIds([courseRow.id]);
+    const displayTitleMap = new Map<string, string>();
+    orderRows.forEach((row) => {
+      if (row.displayTitle) {
+        displayTitleMap.set(row.vimeoId, row.displayTitle);
+      }
+    });
     const orderedIds = orderRows.map((row) => row.vimeoId);
     const fetchedVideos = await getVimeoVideosByIds(orderedIds);
     const videoMap = new Map(fetchedVideos.map((v) => [v.id, v]));
     activeVideos = orderedIds
       .map((id) => videoMap.get(id))
-      .filter((video): video is NonNullable<typeof video> => Boolean(video));
+      .filter((video): video is NonNullable<typeof video> => Boolean(video))
+      .map((video) => ({
+        ...video,
+        title: displayTitleMap.get(video.id) ?? video.title,
+      }));
     activeCourseId = courseRow.slug;
     course = {
       ...defaultCourseMeta,

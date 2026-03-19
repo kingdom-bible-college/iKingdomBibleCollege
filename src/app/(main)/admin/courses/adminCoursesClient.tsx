@@ -61,6 +61,7 @@ const resizeThumbnail = async (file: File) => {
 type VideoItem = {
   id: string;
   title: string;
+  originalTitle: string;
   durationLabel: string;
   thumbnail: string | null;
 };
@@ -87,13 +88,18 @@ export default function AdminCoursesClient({
   initialCourses: AdminCourseItem[];
 }) {
   const [courses, setCourses] = useState(initialCourses);
+  const [titleDrafts, setTitleDrafts] = useState<Record<string, string>>({});
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [draggingVideo, setDraggingVideo] = useState<{
     courseId: number;
     videoId: string;
   } | null>(null);
   const [saving, setSaving] = useState(false);
+  const [savingTitleKey, setSavingTitleKey] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+
+  const getVideoDraftKey = (courseId: number, videoId: string) =>
+    `${courseId}:${videoId}`;
 
   const courseIndexById = useMemo(() => {
     const map = new Map<number, number>();
@@ -239,6 +245,104 @@ export default function AdminCoursesClient({
     );
   };
 
+  const persistVideoTitle = async (
+    courseId: number,
+    vimeoId: string,
+    displayTitle: string | null
+  ) => {
+    const draftKey = getVideoDraftKey(courseId, vimeoId);
+    setSaving(true);
+    setSavingTitleKey(draftKey);
+    setSavedAt(null);
+
+    try {
+      const response = await fetch("/api/admin/courses/videos/title", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId, vimeoId, displayTitle }),
+      });
+
+      if (!response.ok) {
+        alert("강의 이름 저장에 실패했습니다.");
+        return false;
+      }
+
+      setSavedAt(new Date().toLocaleTimeString("ko-KR"));
+      return true;
+    } finally {
+      setSaving(false);
+      setSavingTitleKey(null);
+    }
+  };
+
+  const handleVideoTitleChange = (
+    courseId: number,
+    videoId: string,
+    value: string
+  ) => {
+    const draftKey = getVideoDraftKey(courseId, videoId);
+    setTitleDrafts((prev) => ({ ...prev, [draftKey]: value }));
+  };
+
+  const clearVideoTitleDraft = (courseId: number, videoId: string) => {
+    const draftKey = getVideoDraftKey(courseId, videoId);
+    setTitleDrafts((prev) => {
+      const next = { ...prev };
+      delete next[draftKey];
+      return next;
+    });
+  };
+
+  const handleVideoTitleSave = async (courseId: number, video: VideoItem) => {
+    const draftKey = getVideoDraftKey(courseId, video.id);
+    const draftValue = (titleDrafts[draftKey] ?? video.title).trim();
+    const nextTitle = draftValue || video.originalTitle;
+    const nextDisplayTitle = nextTitle === video.originalTitle ? null : nextTitle;
+
+    if (nextTitle === video.title) {
+      clearVideoTitleDraft(courseId, video.id);
+      return;
+    }
+
+    const updated = await persistVideoTitle(courseId, video.id, nextDisplayTitle);
+    if (!updated) return;
+
+    setCourses((prev) =>
+      prev.map((course) =>
+        course.id === courseId
+          ? {
+              ...course,
+              videos: course.videos.map((item) =>
+                item.id === video.id ? { ...item, title: nextTitle } : item
+              ),
+            }
+          : course
+      )
+    );
+    clearVideoTitleDraft(courseId, video.id);
+  };
+
+  const handleVideoTitleReset = async (courseId: number, video: VideoItem) => {
+    const updated = await persistVideoTitle(courseId, video.id, null);
+    if (!updated) return;
+
+    setCourses((prev) =>
+      prev.map((course) =>
+        course.id === courseId
+          ? {
+              ...course,
+              videos: course.videos.map((item) =>
+                item.id === video.id
+                  ? { ...item, title: item.originalTitle }
+                  : item
+              ),
+            }
+          : course
+      )
+    );
+    clearVideoTitleDraft(courseId, video.id);
+  };
+
   if (!courses.length) {
     return (
       <div className={styles.empty}>
@@ -361,6 +465,14 @@ export default function AdminCoursesClient({
             {course.videos.length ? (
               <div className={styles.videoList}>
                 {course.videos.map((video) => {
+                  const draftKey = getVideoDraftKey(course.id, video.id);
+                  const draftTitle = titleDrafts[draftKey] ?? video.title;
+                  const normalizedDraftTitle = draftTitle.trim();
+                  const resolvedDraftTitle =
+                    normalizedDraftTitle || video.originalTitle;
+                  const hasTitleChanges = resolvedDraftTitle !== video.title;
+                  const isUsingCustomTitle = video.title !== video.originalTitle;
+
                   return (
                   <div
                     key={video.id}
@@ -405,10 +517,54 @@ export default function AdminCoursesClient({
                         )}
                       </div>
                       <div className={styles.videoCopy}>
-                        <span className={styles.videoTitle}>{video.title}</span>
                         <span className={styles.videoDuration}>
                           {video.durationLabel}
                         </span>
+                        <label className={styles.videoRenameLabel}>
+                          <span>표시 이름</span>
+                          <input
+                            type="text"
+                            value={draftTitle}
+                            onChange={(event) =>
+                              handleVideoTitleChange(
+                                course.id,
+                                video.id,
+                                event.currentTarget.value
+                              )
+                            }
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                void handleVideoTitleSave(course.id, video);
+                              }
+                            }}
+                            placeholder={video.originalTitle}
+                            className={styles.videoTitleInput}
+                          />
+                        </label>
+                        <span className={styles.videoOriginalTitle}>
+                          Vimeo 원본: {video.originalTitle}
+                        </span>
+                        <div className={styles.videoRenameActions}>
+                          <button
+                            type="button"
+                            className={styles.ghostButton}
+                            disabled={!hasTitleChanges || savingTitleKey === draftKey}
+                            onClick={() => void handleVideoTitleSave(course.id, video)}
+                          >
+                            {savingTitleKey === draftKey ? "저장 중..." : "이름 저장"}
+                          </button>
+                          {(isUsingCustomTitle || hasTitleChanges) ? (
+                            <button
+                              type="button"
+                              className={styles.videoResetButton}
+                              disabled={savingTitleKey === draftKey}
+                              onClick={() => void handleVideoTitleReset(course.id, video)}
+                            >
+                              원본으로 복원
+                            </button>
+                          ) : null}
+                        </div>
                       </div>
                     </div>
                   </div>

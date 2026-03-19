@@ -112,15 +112,24 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
   ]);
 
   const orderMap = new Map<number, string[]>();
+  const titleMap = new Map<number, Map<string, string>>();
   orderRows.forEach((row) => {
     if (!orderMap.has(row.courseId)) {
       orderMap.set(row.courseId, []);
     }
     orderMap.get(row.courseId)?.push(row.vimeoId);
+
+    if (row.displayTitle) {
+      if (!titleMap.has(row.courseId)) {
+        titleMap.set(row.courseId, new Map());
+      }
+      titleMap.get(row.courseId)?.set(row.vimeoId, row.displayTitle);
+    }
   });
   const videoMap = new Map(videos.map((video) => [video.id, video]));
   const courseItems: AdminCourseItem[] = courseRows.map((course) => {
     const orderedIds = orderMap.get(course.id) ?? [];
+    const courseTitleMap = titleMap.get(course.id) ?? new Map<string, string>();
     const selectedVideos = orderedIds
       .map((id) => videoMap.get(id))
       .filter((video): video is NonNullable<typeof video> => Boolean(video));
@@ -132,7 +141,8 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
       totalLectures: selectedVideos.length,
       videos: selectedVideos.map((video) => ({
         id: video.id,
-        title: video.title,
+        title: courseTitleMap.get(video.id) ?? video.title,
+        originalTitle: video.title,
         durationLabel: formatLessonDuration(video.duration),
         thumbnail: video.thumbnail,
       })),
