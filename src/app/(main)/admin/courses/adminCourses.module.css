@@ -481,6 +481,65 @@
   border: 1px solid #eef2f7;
 }
 
+.heroPreview {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  margin-bottom: 12px;
+}
+
+.heroPreviewThumb {
+  width: 160px;
+  height: 90px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #0f172a;
+  flex-shrink: 0;
+}
+
+.heroPreviewThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.heroPreviewFallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  padding: 12px;
+}
+
+.heroPreviewInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.heroPreviewLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.heroPreviewInfo strong {
+  color: #0f172a;
+}
+
+.heroPreviewInfo p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
 .detailHeader {
   display: flex;
   justify-content: space-between;
@@ -523,6 +582,45 @@
   box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
 }
 
+.videoMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.videoThumb {
+  width: 72px;
+  height: 40px;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #0f172a;
+  flex-shrink: 0;
+}
+
+.videoThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.videoThumbFallback {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.videoCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
 .videoTitle {
   color: #1f2937;
   overflow: hidden;
@@ -533,6 +631,12 @@
 .videoDuration {
   color: #6b7280;
   white-space: nowrap;
+}
+
+.heroButtonActive {
+  border-color: #0f766e;
+  background: #ccfbf1;
+  color: #115e59;
 }
 
 @media (max-width: 1024px) {
@@ -555,6 +659,20 @@
 
   .videoPickerGrid {
     flex-direction: column;
+  }
+
+  .heroPreview {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .heroPreviewThumb {
+    width: 100%;
+    height: 180px;
+  }
+
+  .videoItem {
+    grid-template-columns: 1fr;
   }
 }
 

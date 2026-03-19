@@ -221,7 +221,7 @@ export const buildCurriculum = (
     };
   }
 
-  const lessons: CurriculumLesson[] = videos.map((video, index) => ({
+  const lessons: CurriculumLesson[] = videos.map((video) => ({
     id: video.id,
     title: video.title,
     duration: formatLessonDuration(video.duration),
@@ -235,6 +235,9 @@ export const buildCurriculum = (
 
   const computedDuration =
     totalSeconds > 0 ? formatTotalDuration(totalSeconds) : "0분";
+  const preferredHeroId = videos.some((video) => video.id === fallbackHeroId)
+    ? fallbackHeroId ?? ""
+    : lessons[0]?.id || fallbackHeroId || "";
 
   return {
     curriculum: [
@@ -246,7 +249,7 @@ export const buildCurriculum = (
     ] as CurriculumSection[],
     totalLectures: lessons.length,
     totalDuration: computedDuration,
-    heroVideoId: lessons[0]?.id || fallbackHeroId || "",
+    heroVideoId: preferredHeroId,
     hasVimeo: true,
   };
 };

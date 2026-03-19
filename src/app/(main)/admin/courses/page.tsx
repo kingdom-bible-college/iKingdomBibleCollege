@@ -61,6 +61,7 @@ const createCourseAction = async (formData: FormData) => {
   const created = await createCourse({
     title,
     slug,
+    heroVimeoId: selectedIds[0] ?? null,
     matchType: "manual",
     matchValue: title,
     status: "active",
@@ -123,8 +124,15 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     const selectedVideos = orderedIds
       .map((id) => videoMap.get(id))
       .filter((video): video is NonNullable<typeof video> => Boolean(video));
+    const heroVimeoId = selectedVideos.some(
+      (video) => video.id === course.heroVimeoId
+    )
+      ? course.heroVimeoId ?? null
+      : selectedVideos[0]?.id ?? null;
+
     return {
       id: course.id,
+      heroVimeoId,
       title: course.title,
       status: course.status,
       totalLectures: selectedVideos.length,
@@ -132,6 +140,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
         id: video.id,
         title: video.title,
         durationLabel: formatLessonDuration(video.duration),
+        thumbnail: video.thumbnail,
       })),
     };
   });

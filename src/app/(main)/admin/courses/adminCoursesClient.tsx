@@ -7,10 +7,12 @@ type VideoItem = {
   id: string;
   title: string;
   durationLabel: string;
+  thumbnail: string | null;
 };
 
 export type AdminCourseItem = {
   id: number;
+  heroVimeoId: string | null;
   title: string;
   status: string;
   totalLectures: number;
@@ -90,6 +92,27 @@ export default function AdminCoursesClient({
     }
   };
 
+  const persistThumbnail = async (courseId: number, heroVimeoId: string) => {
+    setSaving(true);
+    setSavedAt(null);
+    try {
+      const response = await fetch("/api/admin/courses/thumbnail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId, heroVimeoId }),
+      });
+      if (!response.ok) {
+        alert("대표 썸네일 저장에 실패했습니다.");
+        return false;
+      }
+
+      setSavedAt(new Date().toLocaleTimeString("ko-KR"));
+      return true;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleVideoDrop = async (courseId: number, targetVideoId: string) => {
     if (!draggingVideo || draggingVideo.courseId !== courseId) return;
     const courseIndex = courseIndexById.get(courseId);
@@ -128,6 +151,17 @@ export default function AdminCoursesClient({
     setCourses((prev) => prev.filter((course) => course.id !== courseId));
   };
 
+  const handleThumbnailChange = async (courseId: number, heroVimeoId: string) => {
+    const updated = await persistThumbnail(courseId, heroVimeoId);
+    if (!updated) return;
+
+    setCourses((prev) =>
+      prev.map((course) =>
+        course.id === courseId ? { ...course, heroVimeoId } : course
+      )
+    );
+  };
+
   if (!courses.length) {
     return (
       <div className={styles.empty}>
@@ -152,6 +186,11 @@ export default function AdminCoursesClient({
       </div>
 
       {courses.map((course) => {
+        const currentHeroVideo =
+          course.videos.find((video) => video.id === course.heroVimeoId) ??
+          course.videos[0] ??
+          null;
+
         return (
           <div
             key={course.id}
@@ -196,11 +235,33 @@ export default function AdminCoursesClient({
             <div className={styles.detailHeader}>
               <span>선택된 영상</span>
               <strong>{course.videos.length}개</strong>
-              <em>드래그해서 순서 변경</em>
+              <em>드래그 순서 변경 · 대표 썸네일 선택</em>
+            </div>
+            <div className={styles.heroPreview}>
+              <div className={styles.heroPreviewThumb}>
+                {currentHeroVideo?.thumbnail ? (
+                  <img
+                    src={currentHeroVideo.thumbnail}
+                    alt={`${course.title} 대표 썸네일`}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                ) : (
+                  <div className={styles.heroPreviewFallback}>{course.title}</div>
+                )}
+              </div>
+              <div className={styles.heroPreviewInfo}>
+                <span className={styles.heroPreviewLabel}>현재 대표 썸네일</span>
+                <strong>{currentHeroVideo?.title ?? "대표 영상이 없습니다."}</strong>
+                <p>강의 카드와 상세 상단 대표 영상에 사용됩니다.</p>
+              </div>
             </div>
             {course.videos.length ? (
               <div className={styles.videoList}>
-                {course.videos.map((video) => (
+                {course.videos.map((video) => {
+                  const isHero = video.id === course.heroVimeoId;
+
+                  return (
                   <div
                     key={video.id}
                     className={`${styles.videoItem} ${
@@ -230,12 +291,39 @@ export default function AdminCoursesClient({
                     >
                       ⋮⋮
                     </button>
-                    <span className={styles.videoTitle}>{video.title}</span>
-                    <span className={styles.videoDuration}>
-                      {video.durationLabel}
-                    </span>
+                    <div className={styles.videoMeta}>
+                      <div className={styles.videoThumb}>
+                        {video.thumbnail ? (
+                          <img
+                            src={video.thumbnail}
+                            alt={`${video.title} 썸네일`}
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <div className={styles.videoThumbFallback}>썸네일</div>
+                        )}
+                      </div>
+                      <div className={styles.videoCopy}>
+                        <span className={styles.videoTitle}>{video.title}</span>
+                        <span className={styles.videoDuration}>
+                          {video.durationLabel}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className={`${styles.ghostButton} ${
+                        isHero ? styles.heroButtonActive : ""
+                      }`}
+                      onClick={() => void handleThumbnailChange(course.id, video.id)}
+                      disabled={saving && !isHero}
+                    >
+                      {isHero ? "대표 썸네일" : "대표로 설정"}
+                    </button>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className={styles.matchListEmpty}>
