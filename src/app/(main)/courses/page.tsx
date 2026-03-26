@@ -1,7 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Manrope } from "next/font/google";
 import styles from "./list.module.css";
-import { getVimeoVideos } from "@/lib/vimeo";
+import { getVimeoVideos, getVimeoVideosByIds } from "@/lib/vimeo";
 import { buildCourseGroups } from "./courseUtils";
 import { requireUser } from "@/lib/auth/session";
 import { getCourses } from "@/db/queries/courses";
@@ -15,15 +16,18 @@ const bodyFont = Manrope({
 });
 
 export default async function CoursesListPage() {
-  await requireUser();
-  const [videos, courseRows] = await Promise.all([
-    getVimeoVideos(),
+  const [, courseRows] = await Promise.all([
+    requireUser(),
     getCourses(),
   ]);
   const activeCourses = courseRows.filter((course) => course.status === "active");
   const orderRows = await getCourseVideoOrdersByCourseIds(
     activeCourses.map((course) => course.id)
   );
+  const orderedVideoIds = Array.from(new Set(orderRows.map((row) => row.vimeoId)));
+  const videos = activeCourses.length
+    ? await getVimeoVideosByIds(orderedVideoIds)
+    : await getVimeoVideos();
   const orderMap = new Map<number, string[]>();
   orderRows.forEach((row) => {
     if (!orderMap.has(row.courseId)) {
@@ -86,7 +90,7 @@ export default async function CoursesListPage() {
       <section className={styles.gridSection}>
         {courseGroups.length ? (
           <div className={styles.grid}>
-            {courseGroups.map((group) => (
+            {courseGroups.map((group, index) => (
               <Link
                 key={group.slug}
                 href={`/courses/${group.slug}`}
@@ -95,11 +99,13 @@ export default async function CoursesListPage() {
               >
                 <div className={styles.cover}>
                   {group.coverImage ? (
-                    <img
+                    <Image
                       src={group.coverImage}
                       alt={`${group.title} 대표 이미지`}
-                      loading="lazy"
-                      decoding="async"
+                      fill
+                      className={styles.coverImage}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      priority={index < 3}
                     />
                   ) : (
                     <div className={styles.coverFallback}>

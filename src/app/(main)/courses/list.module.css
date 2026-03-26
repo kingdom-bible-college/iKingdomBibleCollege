@@ -110,14 +110,14 @@
   overflow: hidden;
 }
 
-.cover img {
+.coverImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
 
-.card:hover .cover img {
+.card:hover .coverImage {
   transform: scale(1.03);
 }
 

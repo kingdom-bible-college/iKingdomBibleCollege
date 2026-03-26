@@ -39,7 +39,7 @@ export function useTTS() {
     setIsLoading(true);
     setIsPlaying(true);
 
-    return new Promise<void>(async (resolve, reject) => {
+    return new Promise<void>(async (resolve) => {
       resolveRef.current = resolve;
 
       const handleEnd = () => {

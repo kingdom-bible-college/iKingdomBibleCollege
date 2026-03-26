@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
 
 type MenuType = 'recommendation' | 'greeting' | 'introduction' | 'admission' | 'partners';
@@ -13,21 +15,15 @@ const menuItems: { id: MenuType; title: string }[] = [
   { id: 'partners', title: '협력기관(MOU) 현황' },
 ];
 
+const isMenuType = (value: string | null): value is MenuType => {
+  return value !== null && menuItems.some((item) => item.id === value);
+};
+
 export default function AboutPage() {
-  const [activeMenu, setActiveMenu] = useState<MenuType>('recommendation');
-
-  useEffect(() => {
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    const params = new URLSearchParams(window.location.search);
-    const menuParam = params.get('menu');
-
-    if (menuParam && menuItems.some((item) => item.id === menuParam)) {
-      setActiveMenu(menuParam as MenuType);
-    }
-  }, []);
+  const searchParams = useSearchParams();
+  const [selectedMenu, setSelectedMenu] = useState<MenuType | null>(null);
+  const menuParam = searchParams.get('menu');
+  const activeMenu = selectedMenu ?? (isMenuType(menuParam) ? menuParam : 'recommendation');
 
   return (
     <main className={styles.main}>
@@ -46,7 +42,7 @@ export default function AboutPage() {
               <li key={item.id}>
                 <button
                   className={`${styles.menuItem} ${activeMenu === item.id ? styles.active : ''}`}
-                  onClick={() => setActiveMenu(item.id)}
+                  onClick={() => setSelectedMenu(item.id)}
                 >
                   {item.title}
                 </button>
@@ -67,7 +63,13 @@ export default function AboutPage() {
                 <h3 className={styles.recommendSubtitle}>이사장 추천사</h3>
                 <div className={styles.recommendContent}>
                   <div className={styles.profileSection}>
-                    <img src="/이영환.png" alt="이영환 목사" className={styles.profileImage} />
+                    <Image
+                      src="/이영환.png"
+                      alt="이영환 목사"
+                      width={80}
+                      height={80}
+                      className={styles.profileImage}
+                    />
                     <div className={styles.profileInfo}>
                       <strong>이영환 목사</strong>
                       <span>한밭제일교회 원로 / 장자사역원 대표</span>
@@ -101,7 +103,13 @@ export default function AboutPage() {
                 <h3 className={styles.recommendSubtitle}>자문위원 대표 추천사</h3>
                 <div className={styles.recommendContent}>
                   <div className={styles.profileSection}>
-                    <img src="/김상복 목사.png" alt="김상복 목사" className={styles.profileImage} />
+                    <Image
+                      src="/김상복 목사.png"
+                      alt="김상복 목사"
+                      width={80}
+                      height={80}
+                      className={styles.profileImage}
+                    />
                     <div className={styles.profileInfo}>
                       <strong>김상복 목사</strong>
                       <span>세계복음주의연맹(WEA) 명예회장 / 할렐루야교회 원로목사</span>
@@ -115,7 +123,7 @@ export default function AboutPage() {
                     </p>
                     <p>
                       그러나 누구나 알아들고 이해하고 누릴 수 있는 보편성이 있어야 참된 진리입니다. 
-                      그래서 예수님은 "내가 곧 진리"(요14:6)라고 하셨고 또 "하나님의 말씀"(요17:17)이 
+                      그래서 예수님은 “내가 곧 진리”(요14:6)라고 하셨고 또 “하나님의 말씀”(요17:17)이 
                       진리라고 하셨습니다. 누구나 예수 그리스도를 만나면 영원으로 가는 길과 우주의 모든 
                       신비를 하나씩 이해하기 시작합니다.
                     </p>

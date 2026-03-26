@@ -1,12 +1,11 @@
 "use client";
 
 import { Suspense, useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import styles from "../auth.module.css";
 
 function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const status = searchParams.get("status");
 

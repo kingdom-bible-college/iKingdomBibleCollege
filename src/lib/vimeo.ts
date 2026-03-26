@@ -1,6 +1,9 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
+
 const VIMEO_API_BASE = "https://api.vimeo.com";
+const VIMEO_REVALIDATE_SECONDS = 300;
 
 export type VimeoVideo = {
   id: string;
@@ -50,6 +53,16 @@ const getThumbnail = (pictures?: VimeoPicture | null): string | null => {
   return sizes.length ? sizes[sizes.length - 1]?.link ?? null : null;
 };
 
+const mapVimeoVideo = (video: VimeoApiVideo): VimeoVideo => ({
+  id: parseVideoId(video.uri),
+  title: video.name ?? "Untitled",
+  duration: Number(video.duration ?? 0),
+  description: video.description ?? null,
+  link: video.link ?? null,
+  thumbnail: getThumbnail(video.pictures),
+  hash: parseHash(video.link),
+});
+
 const parseVideoId = (uri?: string): string => {
   if (!uri) return "";
   const parts = uri.split("/");
@@ -85,7 +98,7 @@ const fetchVimeo = async (path: string) => {
 
   const response = await fetch(`${VIMEO_API_BASE}${path}`, {
     headers,
-    next: { revalidate: 300 },
+    next: { revalidate: VIMEO_REVALIDATE_SECONDS },
   });
 
   if (!response.ok) {
@@ -120,92 +133,115 @@ const fetchPaged = async (pathBase: string) => {
   return all;
 };
 
-export const getVimeoVideos = async (): Promise<VimeoVideo[]> => {
-  const all = (await fetchPaged("/me/videos")) as VimeoApiVideo[];
+const getCachedVimeoVideos = unstable_cache(
+  async (): Promise<VimeoVideo[]> => {
+    const all = (await fetchPaged("/me/videos")) as VimeoApiVideo[];
+    return all.map(mapVimeoVideo);
+  },
+  ["vimeo-videos"],
+  { revalidate: VIMEO_REVALIDATE_SECONDS }
+);
 
-  return all.map((video) => ({
-    id: parseVideoId(video.uri),
-    title: video.name ?? "Untitled",
-    duration: Number(video.duration ?? 0),
-    description: video.description ?? null,
-    link: video.link ?? null,
-    thumbnail: getThumbnail(video.pictures),
-    hash: parseHash(video.link),
-  }));
+export const getVimeoVideos = async (): Promise<VimeoVideo[]> => {
+  return getCachedVimeoVideos();
 };
+
+const getCachedVimeoProjectVideos = unstable_cache(
+  async (projectId: string): Promise<VimeoVideo[]> => {
+    const all = (await fetchPaged(
+      `/me/projects/${projectId}/videos`
+    )) as VimeoApiVideo[];
+
+    return all.map(mapVimeoVideo);
+  },
+  ["vimeo-project-videos"],
+  { revalidate: VIMEO_REVALIDATE_SECONDS }
+);
 
 export const getVimeoProjectVideos = async (
   projectId: string
 ): Promise<VimeoVideo[]> => {
   if (!projectId) return [];
-  const all = (await fetchPaged(
-    `/me/projects/${projectId}/videos`
-  )) as VimeoApiVideo[];
-
-  return all.map((video) => ({
-    id: parseVideoId(video.uri),
-    title: video.name ?? "Untitled",
-    duration: Number(video.duration ?? 0),
-    description: video.description ?? null,
-    link: video.link ?? null,
-    thumbnail: getThumbnail(video.pictures),
-    hash: parseHash(video.link),
-  }));
+  return getCachedVimeoProjectVideos(projectId);
 };
 
+const getCachedVimeoProjects = unstable_cache(
+  async (): Promise<VimeoProject[]> => {
+    const perPage = Number(process.env.VIMEO_PER_PAGE || "50");
+    const maxPages = Number(process.env.VIMEO_MAX_PAGES || "50");
+    const all: VimeoApiProject[] = [];
+
+    let page = 1;
+    while (page <= maxPages) {
+      const data = (await fetchVimeo(
+        `/me/projects?per_page=${perPage}&page=${page}`
+      )) as VimeoPagedResponse | null;
+
+      if (!data || !Array.isArray(data.data)) break;
+
+      const batch = data.data as VimeoApiProject[];
+      all.push(...batch);
+
+      const hasNext = Boolean(data.paging?.next);
+      if (!hasNext || batch.length < perPage) break;
+
+      page += 1;
+    }
+
+    return all
+      .map((project) => ({
+        id: parseProjectId(project.uri),
+        name: project.name ?? "Untitled",
+      }))
+      .filter((project) => project.id);
+  },
+  ["vimeo-projects"],
+  { revalidate: VIMEO_REVALIDATE_SECONDS }
+);
+
 export const getVimeoProjects = async (): Promise<VimeoProject[]> => {
-  const perPage = Number(process.env.VIMEO_PER_PAGE || "50");
-  const maxPages = Number(process.env.VIMEO_MAX_PAGES || "50");
-  const all: VimeoApiProject[] = [];
-
-  let page = 1;
-  while (page <= maxPages) {
-    const data = (await fetchVimeo(
-      `/me/projects?per_page=${perPage}&page=${page}`
-    )) as VimeoPagedResponse | null;
-
-    if (!data || !Array.isArray(data.data)) break;
-
-    const batch = data.data as VimeoApiProject[];
-    all.push(...batch);
-
-    const hasNext = Boolean(data.paging?.next);
-    if (!hasNext || batch.length < perPage) break;
-
-    page += 1;
-  }
-
-  return all
-    .map((project) => ({
-      id: parseProjectId(project.uri),
-      name: project.name ?? "Untitled",
-    }))
-    .filter((project) => project.id);
+  return getCachedVimeoProjects();
 };
 
 export const getVimeoVideosByIds = async (
   ids: string[]
 ): Promise<VimeoVideo[]> => {
   if (!ids.length) return [];
-  const results = await Promise.all(ids.map((id) => getVimeoVideoById(id)));
-  return results.filter((v): v is VimeoVideo => v !== null);
+
+  const orderedIds = ids.map((id) => String(id)).filter(Boolean);
+  const uniqueIds = Array.from(new Set(orderedIds));
+  const results = await Promise.all(uniqueIds.map((id) => getVimeoVideoById(id)));
+  const videoMap = new Map(
+    results
+      .filter((video): video is VimeoVideo => video !== null)
+      .map((video) => [video.id, video])
+  );
+
+  return orderedIds
+    .map((id) => videoMap.get(id))
+    .filter((video): video is VimeoVideo => Boolean(video));
 };
+
+const getCachedVimeoVideoById = unstable_cache(
+  async (id: string): Promise<VimeoVideo | null> => {
+    const data = await fetchVimeo(`/videos/${id}`);
+    if (!data) return null;
+
+    return mapVimeoVideo(data as VimeoApiVideo);
+  },
+  ["vimeo-video-by-id"],
+  { revalidate: VIMEO_REVALIDATE_SECONDS }
+);
 
 export const getVimeoVideoById = async (
   id: string
 ): Promise<VimeoVideo | null> => {
   if (!id) return null;
-  const data = await fetchVimeo(`/videos/${id}`);
-  if (!data) return null;
+  const video = await getCachedVimeoVideoById(id);
+  if (!video) return null;
 
-  const video = data as VimeoApiVideo;
   return {
-    id: parseVideoId(video.uri) || id,
-    title: video.name ?? "Untitled",
-    duration: Number(video.duration ?? 0),
-    description: video.description ?? null,
-    link: video.link ?? null,
-    thumbnail: getThumbnail(video.pictures),
-    hash: parseHash(video.link),
+    ...video,
+    id: video.id || id,
   };
 };
