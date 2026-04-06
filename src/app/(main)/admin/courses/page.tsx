@@ -16,6 +16,7 @@ import {
   getCourseVideoOrdersByCourseIds,
 } from "@/db/queries/courseVideoOrders";
 import {
+  dedupeCourseVideoRows,
   hasMissingCourseVideoMetadata,
   syncAllCourseVideoMetadata,
   syncCourseVideoMetadata,
@@ -148,7 +149,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     rowsByCourseId.get(row.courseId)?.push(row);
   });
   const courseItems: AdminCourseItem[] = courseRows.map((course) => {
-    const selectedRows = rowsByCourseId.get(course.id) ?? [];
+    const selectedRows = dedupeCourseVideoRows(rowsByCourseId.get(course.id) ?? []);
     return {
       id: course.id,
       coverImage: course.coverImage ?? null,
@@ -194,9 +195,21 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
           </p>
         </div>
         <div className={styles.actions}>
-          <button className={styles.secondaryButton} type="button" disabled>
-            강의 생성 (준비중)
-          </button>
+          <Link
+            href={{
+              pathname: "/admin/courses",
+              query: {
+                view: "add",
+                ...(selectedProjectId !== "all"
+                  ? { project: selectedProjectId }
+                  : {}),
+              },
+            }}
+            className={styles.secondaryButton}
+            prefetch={false}
+          >
+            강의 생성
+          </Link>
           <form action={syncCourseMetadataAction}>
             <SyncCoursesButton />
           </form>

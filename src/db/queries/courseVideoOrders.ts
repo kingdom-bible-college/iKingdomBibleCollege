@@ -12,6 +12,19 @@ export type ReplaceCourseVideoOrderInput = {
   vimeoHash: string | null;
 };
 
+const dedupeOrderedVideos = (orderedVideos: ReplaceCourseVideoOrderInput[]) => {
+  const seen = new Set<string>();
+
+  return orderedVideos.filter((video) => {
+    if (seen.has(video.vimeoId)) {
+      return false;
+    }
+
+    seen.add(video.vimeoId);
+    return true;
+  });
+};
+
 export async function getCourseVideoOrdersByCourseIds(courseIds: number[]) {
   if (!courseIds.length) return [];
   return db
@@ -29,6 +42,7 @@ export async function replaceCourseVideoOrders(
   courseId: number,
   orderedVideos: ReplaceCourseVideoOrderInput[]
 ) {
+  const uniqueOrderedVideos = dedupeOrderedVideos(orderedVideos);
   const existingRows = await db
     .select({
       vimeoId: courseVideoOrders.vimeoId,
@@ -42,8 +56,8 @@ export async function replaceCourseVideoOrders(
   );
 
   await db.delete(courseVideoOrders).where(eq(courseVideoOrders.courseId, courseId));
-  if (!orderedVideos.length) return [];
-  const rows: NewCourseVideoOrder[] = orderedVideos.map((video, index) => ({
+  if (!uniqueOrderedVideos.length) return [];
+  const rows: NewCourseVideoOrder[] = uniqueOrderedVideos.map((video, index) => ({
     courseId,
     vimeoId: video.vimeoId,
     displayTitle: titleMap.get(video.vimeoId) ?? null,

@@ -1,4 +1,12 @@
-import { pgTable, serial, text, timestamp, varchar, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  varchar,
+  integer,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core';
 
 // 예시 테이블: users
 export const users = pgTable('users', {
@@ -50,21 +58,29 @@ export const courses = pgTable('courses', {
 export type Course = typeof courses.$inferSelect;
 export type NewCourse = typeof courses.$inferInsert;
 
-export const courseVideoOrders = pgTable('course_video_orders', {
-  id: serial('id').primaryKey(),
-  courseId: integer('course_id')
-    .notNull()
-    .references(() => courses.id, { onDelete: 'cascade' }),
-  vimeoId: varchar('vimeo_id', { length: 64 }).notNull(),
-  displayTitle: text('display_title'),
-  originalTitle: text('original_title').notNull().default(''),
-  durationSeconds: integer('duration_seconds').notNull().default(0),
-  thumbnailUrl: text('thumbnail_url'),
-  vimeoHash: varchar('vimeo_hash', { length: 255 }),
-  sortOrder: integer('sort_order').notNull().default(0),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+export const courseVideoOrders = pgTable(
+  'course_video_orders',
+  {
+    id: serial('id').primaryKey(),
+    courseId: integer('course_id')
+      .notNull()
+      .references(() => courses.id, { onDelete: 'cascade' }),
+    vimeoId: varchar('vimeo_id', { length: 64 }).notNull(),
+    displayTitle: text('display_title'),
+    originalTitle: text('original_title').notNull().default(''),
+    durationSeconds: integer('duration_seconds').notNull().default(0),
+    thumbnailUrl: text('thumbnail_url'),
+    vimeoHash: varchar('vimeo_hash', { length: 255 }),
+    sortOrder: integer('sort_order').notNull().default(0),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  },
+  (table) => ({
+    courseVideoOrdersCourseIdVimeoIdUnique: uniqueIndex(
+      'course_video_orders_course_id_vimeo_id_unique'
+    ).on(table.courseId, table.vimeoId),
+  })
+);
 
 export type CourseVideoOrder = typeof courseVideoOrders.$inferSelect;
 export type NewCourseVideoOrder = typeof courseVideoOrders.$inferInsert;

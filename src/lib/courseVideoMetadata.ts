@@ -19,6 +19,32 @@ type StoredCourseVideoRow = Pick<
   | "vimeoHash"
 >;
 
+export const dedupeOrderedVideoIds = (orderedVideoIds: string[]) => {
+  const seen = new Set<string>();
+
+  return orderedVideoIds.filter((videoId) => {
+    if (seen.has(videoId)) {
+      return false;
+    }
+
+    seen.add(videoId);
+    return true;
+  });
+};
+
+export const dedupeCourseVideoRows = <T extends StoredCourseVideoRow>(rows: T[]) => {
+  const seen = new Set<string>();
+
+  return rows.filter((row) => {
+    if (seen.has(row.vimeoId)) {
+      return false;
+    }
+
+    seen.add(row.vimeoId);
+    return true;
+  });
+};
+
 const toStoredVideoInputs = (
   orderedVideoIds: string[],
   videoMap: Map<string, VimeoVideo>
@@ -41,7 +67,7 @@ export const hasMissingCourseVideoMetadata = (rows: StoredCourseVideoRow[]) =>
 export const mapCourseVideoRowsToVimeoVideos = (
   rows: StoredCourseVideoRow[]
 ): VimeoVideo[] =>
-  rows.map((row) => ({
+  dedupeCourseVideoRows(rows).map((row) => ({
     id: row.vimeoId,
     title: row.displayTitle ?? (row.originalTitle || "Untitled"),
     duration: row.durationSeconds,
@@ -55,7 +81,9 @@ export async function syncCourseVideoMetadata(
   courseId: number,
   orderedVideoIds: string[]
 ) {
-  const normalizedIds = orderedVideoIds.map((id) => String(id)).filter(Boolean);
+  const normalizedIds = dedupeOrderedVideoIds(
+    orderedVideoIds.map((id) => String(id)).filter(Boolean)
+  );
   if (!normalizedIds.length) {
     return replaceCourseVideoOrders(courseId, []);
   }
