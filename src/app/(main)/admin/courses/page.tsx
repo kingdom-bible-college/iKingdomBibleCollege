@@ -28,6 +28,7 @@ import AdminCoursesClient, {
 import { formatLessonDuration } from "@/lib/time";
 import AdminVideoPicker from "./adminVideoPicker";
 import SubmitButton from "./submitButton";
+import SyncCoursesButton from "./syncCoursesButton";
 
 const toSlug = (value: string) =>
   value
@@ -89,11 +90,11 @@ const syncCourseMetadataAction = async () => {
 
   revalidatePath("/admin/courses");
   revalidatePath("/courses");
-  redirect("/admin/courses?view=added");
+  redirect("/admin/courses?view=added&synced=1");
 };
 
 type PageProps = {
-  searchParams?: Promise<{ project?: string; view?: string }>;
+  searchParams?: Promise<{ project?: string; view?: string; synced?: string }>;
 };
 
 export default async function AdminCoursesPage({ searchParams }: PageProps) {
@@ -101,6 +102,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
 
   const resolvedSearch = (await searchParams) ?? {};
   const selectedProjectId = resolvedSearch.project ?? "all";
+  const synced = resolvedSearch.synced === "1";
 
   const courseRows = await getCourses();
   const view =
@@ -196,12 +198,16 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
             강의 생성 (준비중)
           </button>
           <form action={syncCourseMetadataAction}>
-            <button className={styles.primaryButton} type="submit">
-              Vimeo 동기화
-            </button>
+            <SyncCoursesButton />
           </form>
         </div>
       </header>
+
+      {synced ? (
+        <div className={styles.noticeBanner}>
+          Vimeo 메타데이터 동기화가 완료되었습니다.
+        </div>
+      ) : null}
 
       <div className={styles.stats}>
         <div>
