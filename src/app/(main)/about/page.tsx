@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import styles from './page.module.css';
 
@@ -19,7 +19,7 @@ const isMenuType = (value: string | null): value is MenuType => {
   return value !== null && menuItems.some((item) => item.id === value);
 };
 
-export default function AboutPage() {
+function AboutPageContent() {
   const searchParams = useSearchParams();
   const [selectedMenu, setSelectedMenu] = useState<MenuType | null>(null);
   const menuParam = searchParams.get('menu');
@@ -662,5 +662,13 @@ export default function AboutPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function AboutPage() {
+  return (
+    <Suspense>
+      <AboutPageContent />
+    </Suspense>
   );
 }
