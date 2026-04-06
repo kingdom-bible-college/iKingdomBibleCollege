@@ -6,11 +6,16 @@ import {
   defaultCourseMeta,
   courseCatalog,
 } from "../../courseData";
-import { getVimeoVideos, getVimeoVideosByIds } from "@/lib/vimeo";
+import { getVimeoVideos } from "@/lib/vimeo";
 import { buildCourseGroups, buildCurriculum } from "../../courseUtils";
 import { requireUser } from "@/lib/auth/session";
 import { getCourseBySlug } from "@/db/queries/courses";
 import { getCourseVideoOrdersByCourseIds } from "@/db/queries/courseVideoOrders";
+import {
+  hasMissingCourseVideoMetadata,
+  mapCourseVideoRowsToVimeoVideos,
+  syncCourseVideoMetadata,
+} from "@/lib/courseVideoMetadata";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -35,23 +40,15 @@ export default async function LessonDetailPage({ params }: PageProps) {
   let activeCourseSlug = slug;
 
   if (courseRow) {
-    const orderRows = await getCourseVideoOrdersByCourseIds([courseRow.id]);
-    const displayTitleMap = new Map<string, string>();
-    orderRows.forEach((row) => {
-      if (row.displayTitle) {
-        displayTitleMap.set(row.vimeoId, row.displayTitle);
-      }
-    });
-    const orderedIds = orderRows.map((row) => row.vimeoId);
-    const fetchedVideos = await getVimeoVideosByIds(orderedIds);
-    const videoMap = new Map(fetchedVideos.map((video) => [video.id, video]));
-    activeVideos = orderedIds
-      .map((id) => videoMap.get(id))
-      .filter((video): video is NonNullable<typeof video> => Boolean(video))
-      .map((video) => ({
-        ...video,
-        title: displayTitleMap.get(video.id) ?? video.title,
-      }));
+    let orderRows = await getCourseVideoOrdersByCourseIds([courseRow.id]);
+    if (hasMissingCourseVideoMetadata(orderRows)) {
+      await syncCourseVideoMetadata(
+        courseRow.id,
+        orderRows.map((row) => row.vimeoId)
+      );
+      orderRows = await getCourseVideoOrdersByCourseIds([courseRow.id]);
+    }
+    activeVideos = mapCourseVideoRowsToVimeoVideos(orderRows);
     activeCourseSlug = courseRow.slug;
     course = {
       ...defaultCourseMeta,

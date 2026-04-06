@@ -3,9 +3,9 @@
 import { useMemo, useState } from "react";
 import styles from "./adminCourses.module.css";
 
-const MAX_THUMBNAIL_DIMENSION = 1440;
-const THUMBNAIL_OUTPUT_TYPE = "image/jpeg";
-const THUMBNAIL_QUALITY = 0.82;
+const MAX_THUMBNAIL_DIMENSION = 960;
+const THUMBNAIL_OUTPUT_TYPE = "image/webp";
+const THUMBNAIL_QUALITY = 0.76;
 
 const readFileAsDataUrl = (file: File) =>
   new Promise<string>((resolve, reject) => {

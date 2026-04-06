@@ -2,13 +2,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { Manrope } from "next/font/google";
 import styles from "./list.module.css";
-import { getVimeoVideos, getVimeoVideosByIds } from "@/lib/vimeo";
+import { getVimeoVideos } from "@/lib/vimeo";
 import { buildCourseGroups } from "./courseUtils";
 import { requireUser } from "@/lib/auth/session";
 import { getCourses } from "@/db/queries/courses";
 import { getCourseVideoOrdersByCourseIds } from "@/db/queries/courseVideoOrders";
 import { courseCatalog, defaultCourseMeta } from "./courseData";
 import { formatTotalDuration } from "@/lib/time";
+import {
+  hasMissingCourseVideoMetadata,
+  mapCourseVideoRowsToVimeoVideos,
+  syncCourseVideoMetadataByCourseIds,
+} from "@/lib/courseVideoMetadata";
 
 const bodyFont = Manrope({
   subsets: ["latin"],
@@ -21,27 +26,28 @@ export default async function CoursesListPage() {
     getCourses(),
   ]);
   const activeCourses = courseRows.filter((course) => course.status === "active");
-  const orderRows = await getCourseVideoOrdersByCourseIds(
+  let orderRows = await getCourseVideoOrdersByCourseIds(
     activeCourses.map((course) => course.id)
   );
-  const orderedVideoIds = Array.from(new Set(orderRows.map((row) => row.vimeoId)));
-  const videos = activeCourses.length
-    ? await getVimeoVideosByIds(orderedVideoIds)
-    : await getVimeoVideos();
-  const orderMap = new Map<number, string[]>();
+  if (activeCourses.length > 0 && hasMissingCourseVideoMetadata(orderRows)) {
+    await syncCourseVideoMetadataByCourseIds(activeCourses.map((course) => course.id));
+    orderRows = await getCourseVideoOrdersByCourseIds(
+      activeCourses.map((course) => course.id)
+    );
+  }
+  const fallbackVideos = activeCourses.length ? [] : await getVimeoVideos();
+  const rowsByCourseId = new Map<number, typeof orderRows>();
   orderRows.forEach((row) => {
-    if (!orderMap.has(row.courseId)) {
-      orderMap.set(row.courseId, []);
+    if (!rowsByCourseId.has(row.courseId)) {
+      rowsByCourseId.set(row.courseId, []);
     }
-    orderMap.get(row.courseId)?.push(row.vimeoId);
+    rowsByCourseId.get(row.courseId)?.push(row);
   });
-  const videoMap = new Map(videos.map((video) => [video.id, video]));
 
   const manualGroups = activeCourses.map((course) => {
-    const orderedIds = orderMap.get(course.id) ?? [];
-    const selectedVideos = orderedIds
-      .map((id) => videoMap.get(id))
-      .filter((video): video is NonNullable<typeof video> => Boolean(video));
+    const selectedVideos = mapCourseVideoRowsToVimeoVideos(
+      rowsByCourseId.get(course.id) ?? []
+    );
     const totalSeconds = selectedVideos.reduce(
       (sum, video) => sum + (Number.isFinite(video.duration) ? video.duration : 0),
       0
@@ -73,7 +79,9 @@ export default async function CoursesListPage() {
   });
 
   const courseGroups =
-    activeCourses.length > 0 ? manualGroups : buildCourseGroups(videos, courseCatalog);
+    activeCourses.length > 0
+      ? manualGroups
+      : buildCourseGroups(fallbackVideos, courseCatalog);
 
   return (
     <main className={`${styles.main} ${bodyFont.className}`}>

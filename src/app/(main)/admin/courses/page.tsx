@@ -6,7 +6,6 @@ import {
   getVimeoProjectVideos,
   getVimeoProjects,
   getVimeoVideos,
-  getVimeoVideosByIds,
 } from "@/lib/vimeo";
 import {
   createCourse,
@@ -15,8 +14,13 @@ import {
 } from "@/db/queries/courses";
 import {
   getCourseVideoOrdersByCourseIds,
-  replaceCourseVideoOrders,
 } from "@/db/queries/courseVideoOrders";
+import {
+  hasMissingCourseVideoMetadata,
+  syncAllCourseVideoMetadata,
+  syncCourseVideoMetadata,
+  syncCourseVideoMetadataByCourseIds,
+} from "@/lib/courseVideoMetadata";
 import styles from "./adminCourses.module.css";
 import AdminCoursesClient, {
   type AdminCourseItem,
@@ -69,8 +73,19 @@ const createCourseAction = async (formData: FormData) => {
   });
 
   if (created) {
-    await replaceCourseVideoOrders(created.id, selectedIds);
+    await syncCourseVideoMetadata(created.id, selectedIds);
   }
+
+  revalidatePath("/admin/courses");
+  revalidatePath("/courses");
+  redirect("/admin/courses?view=added");
+};
+
+const syncCourseMetadataAction = async () => {
+  "use server";
+  await requireAdmin();
+
+  await syncAllCourseVideoMetadata();
 
   revalidatePath("/admin/courses");
   revalidatePath("/courses");
@@ -95,62 +110,55 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
         ? "add"
         : "added";
 
-  const orderRows = await getCourseVideoOrdersByCourseIds(
+  let orderRows = await getCourseVideoOrdersByCourseIds(
     courseRows.map((course) => course.id)
   );
+  const needsPicker = view === "add";
+
+  if (!needsPicker && hasMissingCourseVideoMetadata(orderRows)) {
+    await syncCourseVideoMetadataByCourseIds(courseRows.map((course) => course.id));
+    orderRows = await getCourseVideoOrdersByCourseIds(
+      courseRows.map((course) => course.id)
+    );
+  }
+
   const orderedVideoIds = Array.from(
     new Set(orderRows.map((row) => row.vimeoId))
   );
 
-  const needsPicker = view === "add";
   const shouldLoadAllVideos = needsPicker && selectedProjectId === "all";
   const shouldLoadProjectVideos = needsPicker && selectedProjectId !== "all";
   const [videos, projects, projectVideos] = await Promise.all([
     shouldLoadAllVideos
       ? getVimeoVideos()
-      : needsPicker
-        ? Promise.resolve([])
-        : getVimeoVideosByIds(orderedVideoIds),
+      : Promise.resolve([]),
     needsPicker ? getVimeoProjects() : Promise.resolve([]),
     shouldLoadProjectVideos
       ? getVimeoProjectVideos(selectedProjectId)
       : Promise.resolve([]),
   ]);
 
-  const orderMap = new Map<number, string[]>();
-  const titleMap = new Map<number, Map<string, string>>();
+  const rowsByCourseId = new Map<number, typeof orderRows>();
   orderRows.forEach((row) => {
-    if (!orderMap.has(row.courseId)) {
-      orderMap.set(row.courseId, []);
+    if (!rowsByCourseId.has(row.courseId)) {
+      rowsByCourseId.set(row.courseId, []);
     }
-    orderMap.get(row.courseId)?.push(row.vimeoId);
-
-    if (row.displayTitle) {
-      if (!titleMap.has(row.courseId)) {
-        titleMap.set(row.courseId, new Map());
-      }
-      titleMap.get(row.courseId)?.set(row.vimeoId, row.displayTitle);
-    }
+    rowsByCourseId.get(row.courseId)?.push(row);
   });
-  const videoMap = new Map(videos.map((video) => [video.id, video]));
   const courseItems: AdminCourseItem[] = courseRows.map((course) => {
-    const orderedIds = orderMap.get(course.id) ?? [];
-    const courseTitleMap = titleMap.get(course.id) ?? new Map<string, string>();
-    const selectedVideos = orderedIds
-      .map((id) => videoMap.get(id))
-      .filter((video): video is NonNullable<typeof video> => Boolean(video));
+    const selectedRows = rowsByCourseId.get(course.id) ?? [];
     return {
       id: course.id,
       coverImage: course.coverImage ?? null,
       title: course.title,
       status: course.status,
-      totalLectures: selectedVideos.length,
-      videos: selectedVideos.map((video) => ({
-        id: video.id,
-        title: courseTitleMap.get(video.id) ?? video.title,
-        originalTitle: video.title,
-        durationLabel: formatLessonDuration(video.duration),
-        thumbnail: video.thumbnail,
+      totalLectures: selectedRows.length,
+      videos: selectedRows.map((row) => ({
+        id: row.vimeoId,
+        title: row.displayTitle ?? (row.originalTitle || "Untitled"),
+        originalTitle: row.originalTitle || "Untitled",
+        durationLabel: formatLessonDuration(row.durationSeconds),
+        thumbnail: row.thumbnailUrl ?? null,
       })),
     };
   });
@@ -187,9 +195,11 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
           <button className={styles.secondaryButton} type="button" disabled>
             강의 생성 (준비중)
           </button>
-          <button className={styles.primaryButton} type="button" disabled>
-            Vimeo 동기화
-          </button>
+          <form action={syncCourseMetadataAction}>
+            <button className={styles.primaryButton} type="submit">
+              Vimeo 동기화
+            </button>
+          </form>
         </div>
       </header>
 

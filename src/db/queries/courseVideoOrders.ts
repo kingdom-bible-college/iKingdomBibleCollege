@@ -4,18 +4,30 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import { db } from "../index";
 import { courseVideoOrders, type NewCourseVideoOrder } from "../schema";
 
+export type ReplaceCourseVideoOrderInput = {
+  vimeoId: string;
+  originalTitle: string;
+  durationSeconds: number;
+  thumbnailUrl: string | null;
+  vimeoHash: string | null;
+};
+
 export async function getCourseVideoOrdersByCourseIds(courseIds: number[]) {
   if (!courseIds.length) return [];
   return db
     .select()
     .from(courseVideoOrders)
     .where(inArray(courseVideoOrders.courseId, courseIds))
-    .orderBy(asc(courseVideoOrders.sortOrder), asc(courseVideoOrders.id));
+    .orderBy(
+      asc(courseVideoOrders.courseId),
+      asc(courseVideoOrders.sortOrder),
+      asc(courseVideoOrders.id)
+    );
 }
 
 export async function replaceCourseVideoOrders(
   courseId: number,
-  orderedVideoIds: string[]
+  orderedVideos: ReplaceCourseVideoOrderInput[]
 ) {
   const existingRows = await db
     .select({
@@ -30,11 +42,15 @@ export async function replaceCourseVideoOrders(
   );
 
   await db.delete(courseVideoOrders).where(eq(courseVideoOrders.courseId, courseId));
-  if (!orderedVideoIds.length) return [];
-  const rows: NewCourseVideoOrder[] = orderedVideoIds.map((vimeoId, index) => ({
+  if (!orderedVideos.length) return [];
+  const rows: NewCourseVideoOrder[] = orderedVideos.map((video, index) => ({
     courseId,
-    vimeoId,
-    displayTitle: titleMap.get(vimeoId) ?? null,
+    vimeoId: video.vimeoId,
+    displayTitle: titleMap.get(video.vimeoId) ?? null,
+    originalTitle: video.originalTitle,
+    durationSeconds: video.durationSeconds,
+    thumbnailUrl: video.thumbnailUrl,
+    vimeoHash: video.vimeoHash,
     sortOrder: index + 1,
   }));
   return db.insert(courseVideoOrders).values(rows).returning();

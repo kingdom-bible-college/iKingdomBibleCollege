@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getSessionUser } from "@/lib/auth/session";
-import { replaceCourseVideoOrders } from "@/db/queries/courseVideoOrders";
+import { syncCourseVideoMetadata } from "@/lib/courseVideoMetadata";
 
 export async function POST(request: Request) {
   const user = await getSessionUser();
@@ -21,6 +21,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  await replaceCourseVideoOrders(courseId, orderedVideoIds);
+  await syncCourseVideoMetadata(courseId, orderedVideoIds);
   return NextResponse.json({ ok: true });
 }

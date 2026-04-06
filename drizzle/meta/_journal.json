@@ -43,6 +43,13 @@
       "when": 1773926392548,
       "tag": "0005_cute_warhawk",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1775436977780,
+      "tag": "0006_red_starbolt",
+      "breakpoints": true
     }
   ]
 }
