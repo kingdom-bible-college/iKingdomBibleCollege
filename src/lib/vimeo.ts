@@ -6,6 +6,7 @@ const VIMEO_API_BASE = "https://api.vimeo.com";
 const VIMEO_REVALIDATE_SECONDS = 300;
 // For larger sets, reusing the paged cache is usually faster than N detail calls.
 const VIMEO_BATCH_LOOKUP_THRESHOLD = 8;
+const VIMEO_PAGE_BATCH_SIZE = 4;
 
 export type VimeoVideo = {
   id: string;
@@ -116,20 +117,47 @@ const fetchPaged = async (pathBase: string) => {
   const maxPages = Number(process.env.VIMEO_MAX_PAGES || "50");
   const all: unknown[] = [];
 
-  let page = 1;
-  while (page <= maxPages) {
-    const data = (await fetchVimeo(
+  const fetchPage = async (page: number) =>
+    (await fetchVimeo(
       `${pathBase}?per_page=${perPage}&page=${page}&sort=date&direction=desc`
     )) as VimeoPagedResponse | null;
 
-    if (!data || !Array.isArray(data.data)) break;
+  const firstPage = await fetchPage(1);
+  if (!firstPage || !Array.isArray(firstPage.data)) return all;
 
-    all.push(...data.data);
+  all.push(...firstPage.data);
 
-    const hasNext = Boolean(data.paging?.next);
-    if (!hasNext || data.data.length < perPage) break;
+  const hasMorePages =
+    Boolean(firstPage.paging?.next) && firstPage.data.length >= perPage;
+  if (!hasMorePages) return all;
 
-    page += 1;
+  let nextPage = 2;
+  while (nextPage <= maxPages) {
+    const pages = Array.from(
+      { length: Math.min(VIMEO_PAGE_BATCH_SIZE, maxPages - nextPage + 1) },
+      (_, index) => nextPage + index
+    );
+    const responses = await Promise.all(pages.map((page) => fetchPage(page)));
+
+    let reachedEnd = false;
+    responses.forEach((response) => {
+      if (reachedEnd || !response || !Array.isArray(response.data)) {
+        reachedEnd = true;
+        return;
+      }
+
+      all.push(...response.data);
+
+      if (!response.paging?.next || response.data.length < perPage) {
+        reachedEnd = true;
+      }
+    });
+
+    if (reachedEnd) {
+      break;
+    }
+
+    nextPage += VIMEO_PAGE_BATCH_SIZE;
   }
 
   return all;
