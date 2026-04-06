@@ -48,7 +48,7 @@ export default async function CoursesListPage() {
     );
     const totalDuration = formatTotalDuration(totalSeconds);
     const coverImage = course.coverImage
-      ? `/api/courses/cover/${encodeURIComponent(course.slug)}?v=${course.updatedAt.getTime()}`
+      ? course.coverImage
       : selectedVideos.find((video) => video.id === course.heroVimeoId)?.thumbnail ??
         selectedVideos.find((video) => video.thumbnail)?.thumbnail ??
         null;
@@ -90,42 +90,47 @@ export default async function CoursesListPage() {
       <section className={styles.gridSection}>
         {courseGroups.length ? (
           <div className={styles.grid}>
-            {courseGroups.map((group, index) => (
-              <Link
-                key={group.slug}
-                href={`/courses/${group.slug}`}
-                className={styles.card}
-                prefetch={false}
-              >
-                <div className={styles.cover}>
-                  {group.coverImage ? (
-                    <Image
-                      src={group.coverImage}
-                      alt={`${group.title} 대표 이미지`}
-                      fill
-                      className={styles.coverImage}
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      priority={index < 3}
-                    />
-                  ) : (
-                    <div className={styles.coverFallback}>
-                      <span>{group.title}</span>
-                    </div>
-                  )}
-                  <span className={styles.coverBadge}>회원 전용</span>
-                </div>
-                <div className={styles.cardBody}>
-                  <h2 className={styles.cardTitle}>{group.meta.title}</h2>
-                  <p className={styles.cardSub}>{group.meta.subtitle}</p>
-                  <div className={styles.cardMeta}>
-                    <span>{group.meta.instructor}</span>
-                    <span>{group.totalLectures}개 강의</span>
-                    <span>{group.totalDuration}</span>
+            {courseGroups.map((group, index) => {
+              const usesInlineCover = group.coverImage?.startsWith("data:") ?? false;
+
+              return (
+                <Link
+                  key={group.slug}
+                  href={`/courses/${group.slug}`}
+                  className={styles.card}
+                  prefetch={false}
+                >
+                  <div className={styles.cover}>
+                    {group.coverImage ? (
+                      <Image
+                        src={group.coverImage}
+                        alt={`${group.title} 대표 이미지`}
+                        fill
+                        className={styles.coverImage}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        priority={index < 3}
+                        unoptimized={usesInlineCover}
+                      />
+                    ) : (
+                      <div className={styles.coverFallback}>
+                        <span>{group.title}</span>
+                      </div>
+                    )}
+                    <span className={styles.coverBadge}>회원 전용</span>
                   </div>
-                  <div className={styles.cardAction}>커리큘럼 보기</div>
-                </div>
-              </Link>
-            ))}
+                  <div className={styles.cardBody}>
+                    <h2 className={styles.cardTitle}>{group.meta.title}</h2>
+                    <p className={styles.cardSub}>{group.meta.subtitle}</p>
+                    <div className={styles.cardMeta}>
+                      <span>{group.meta.instructor}</span>
+                      <span>{group.totalLectures}개 강의</span>
+                      <span>{group.totalDuration}</span>
+                    </div>
+                    <div className={styles.cardAction}>커리큘럼 보기</div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         ) : (
           <div className={styles.emptyState}>
