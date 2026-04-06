@@ -103,10 +103,16 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
   );
 
   const needsPicker = view === "add";
+  const shouldLoadAllVideos = needsPicker && selectedProjectId === "all";
+  const shouldLoadProjectVideos = needsPicker && selectedProjectId !== "all";
   const [videos, projects, projectVideos] = await Promise.all([
-    needsPicker ? getVimeoVideos() : getVimeoVideosByIds(orderedVideoIds),
+    shouldLoadAllVideos
+      ? getVimeoVideos()
+      : needsPicker
+        ? Promise.resolve([])
+        : getVimeoVideosByIds(orderedVideoIds),
     needsPicker ? getVimeoProjects() : Promise.resolve([]),
-    needsPicker && selectedProjectId !== "all"
+    shouldLoadProjectVideos
       ? getVimeoProjectVideos(selectedProjectId)
       : Promise.resolve([]),
   ]);
@@ -148,16 +154,19 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
       })),
     };
   });
-  const pickerSource =
-    selectedProjectId !== "all" ? projectVideos : videos;
+  const pickerSource = selectedProjectId !== "all" ? projectVideos : videos;
   const pickerVideos = pickerSource.map((video) => ({
     id: video.id,
     title: video.title,
     durationLabel: formatLessonDuration(video.duration),
     thumbnail: video.thumbnail,
   }));
-  const totalVideos = needsPicker ? videos.length : orderedVideoIds.length;
-  const totalVideosLabel = needsPicker ? "전체 영상" : "등록 영상";
+  const totalVideos = needsPicker ? pickerSource.length : orderedVideoIds.length;
+  const totalVideosLabel = needsPicker
+    ? selectedProjectId === "all"
+      ? "전체 영상"
+      : "선택 폴더 영상"
+    : "등록 영상";
   const selectedProjectName =
     selectedProjectId === "all"
       ? "전체"

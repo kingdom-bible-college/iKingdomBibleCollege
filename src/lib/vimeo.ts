@@ -4,6 +4,8 @@ import { unstable_cache } from "next/cache";
 
 const VIMEO_API_BASE = "https://api.vimeo.com";
 const VIMEO_REVALIDATE_SECONDS = 300;
+// For larger sets, reusing the paged cache is usually faster than N detail calls.
+const VIMEO_BATCH_LOOKUP_THRESHOLD = 8;
 
 export type VimeoVideo = {
   id: string;
@@ -133,6 +135,14 @@ const fetchPaged = async (pathBase: string) => {
   return all;
 };
 
+const getOrderedVideosFromMap = (
+  orderedIds: string[],
+  videoMap: Map<string, VimeoVideo>
+) =>
+  orderedIds
+    .map((id) => videoMap.get(id))
+    .filter((video): video is VimeoVideo => Boolean(video));
+
 const getCachedVimeoVideos = unstable_cache(
   async (): Promise<VimeoVideo[]> => {
     const all = (await fetchPaged("/me/videos")) as VimeoApiVideo[];
@@ -210,6 +220,27 @@ export const getVimeoVideosByIds = async (
 
   const orderedIds = ids.map((id) => String(id)).filter(Boolean);
   const uniqueIds = Array.from(new Set(orderedIds));
+
+  if (uniqueIds.length >= VIMEO_BATCH_LOOKUP_THRESHOLD) {
+    const allVideos = await getCachedVimeoVideos();
+    const videoMap = new Map(allVideos.map((video) => [video.id, video]));
+    const missingIds = uniqueIds.filter((id) => !videoMap.has(id));
+
+    if (missingIds.length) {
+      const missingVideos = await Promise.all(
+        missingIds.map((id) => getVimeoVideoById(id))
+      );
+
+      missingVideos
+        .filter((video): video is VimeoVideo => video !== null)
+        .forEach((video) => {
+          videoMap.set(video.id, video);
+        });
+    }
+
+    return getOrderedVideosFromMap(orderedIds, videoMap);
+  }
+
   const results = await Promise.all(uniqueIds.map((id) => getVimeoVideoById(id)));
   const videoMap = new Map(
     results
@@ -217,9 +248,7 @@ export const getVimeoVideosByIds = async (
       .map((video) => [video.id, video])
   );
 
-  return orderedIds
-    .map((id) => videoMap.get(id))
-    .filter((video): video is VimeoVideo => Boolean(video));
+  return getOrderedVideosFromMap(orderedIds, videoMap);
 };
 
 const getCachedVimeoVideoById = unstable_cache(
