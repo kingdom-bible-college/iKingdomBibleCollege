@@ -90,11 +90,11 @@ const moveItem = <T,>(list: T[], fromIndex: number, toIndex: number) => {
 };
 
 export default function AdminCoursesClient({
-  initialCourses,
-  availableVideos,
+  initialCourses = [],
+  availableVideos = [],
 }: {
-  initialCourses: AdminCourseItem[];
-  availableVideos: AdminAvailableVideo[];
+  initialCourses?: AdminCourseItem[];
+  availableVideos?: AdminAvailableVideo[];
 }) {
   const [courses, setCourses] = useState(initialCourses);
   const [titleDrafts, setTitleDrafts] = useState<Record<string, string>>({});
