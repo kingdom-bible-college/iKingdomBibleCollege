@@ -88,6 +88,8 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const normalizeText = (value: unknown, fallback = "") =>
   typeof value === "string" ? value : fallback;
 
+const normalizeSearchText = (value: string) => value.normalize("NFC").toLowerCase();
+
 const normalizeVideoItem = (value: unknown): VideoItem | null => {
   if (!isRecord(value)) return null;
 
@@ -561,12 +563,30 @@ export default function AdminCoursesClient({
       {courses.map((course) => {
         const existingVideoIds = new Set(course.videos.map((video) => video.id));
         const addSearch = addSearchDrafts[course.id] ?? "";
-        const addKeyword = addSearch.trim().toLowerCase();
+        const addKeyword = normalizeSearchText(addSearch.trim());
         const selectedForAdd = selectedAddVideoIds[course.id] ?? [];
-        const visibleAddVideos = availableVideoItems
-          .filter((video) => !existingVideoIds.has(video.id))
+        const addVideoOptionIds = new Set<string>();
+        const addVideoOptions = [
+          ...course.videos.map((video) => ({
+            id: video.id,
+            title: video.title,
+            durationLabel: video.durationLabel,
+            thumbnail: video.thumbnail,
+          })),
+          ...availableVideoItems,
+        ].filter((video) => {
+          if (addVideoOptionIds.has(video.id)) {
+            return false;
+          }
+
+          addVideoOptionIds.add(video.id);
+          return true;
+        });
+        const visibleAddVideos = addVideoOptions
           .filter((video) =>
-            addKeyword ? video.title.toLowerCase().includes(addKeyword) : true
+            addKeyword
+              ? normalizeSearchText(video.title).includes(addKeyword)
+              : true
           )
           .slice(0, 80);
 
@@ -649,21 +669,34 @@ export default function AdminCoursesClient({
                 {visibleAddVideos.length ? (
                   <div className={styles.addVideoList}>
                     {visibleAddVideos.map((video) => {
-                      const checked = selectedForAdd.includes(video.id);
+                      const alreadyAdded = existingVideoIds.has(video.id);
+                      const checked =
+                        alreadyAdded || selectedForAdd.includes(video.id);
                       return (
                         <label
                           key={video.id}
                           className={`${styles.addVideoItem} ${
                             checked ? styles.addVideoItemActive : ""
+                          } ${
+                            alreadyAdded ? styles.addVideoItemDisabled : ""
                           }`}
                         >
                           <input
                             type="checkbox"
                             checked={checked}
-                            onChange={() => toggleAddVideo(course.id, video.id)}
+                            disabled={alreadyAdded}
+                            onChange={() => {
+                              if (!alreadyAdded) {
+                                toggleAddVideo(course.id, video.id);
+                              }
+                            }}
                           />
                           <span>{video.title}</span>
-                          <em>{video.durationLabel}</em>
+                          <em>
+                            {alreadyAdded
+                              ? "이미 추가됨"
+                              : video.durationLabel}
+                          </em>
                         </label>
                       );
                     })}

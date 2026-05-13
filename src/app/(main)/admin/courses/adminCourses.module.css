@@ -687,6 +687,20 @@
   background: #eff6ff;
 }
 
+.addVideoItemDisabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+}
+
+.addVideoItemDisabled input {
+  cursor: not-allowed;
+}
+
+.addVideoItemDisabled em {
+  color: #2563eb;
+  font-weight: 700;
+}
+
 .addVideoActions {
   justify-content: flex-end;
 }
