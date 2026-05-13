@@ -637,12 +637,13 @@ export default function AdminCoursesClient({
                   type="search"
                   className={styles.addVideoSearch}
                   value={addSearch}
-                  onChange={(event) =>
+                  onChange={(event) => {
+                    const value = event.currentTarget.value;
                     setAddSearchDrafts((prev) => ({
                       ...prev,
-                      [course.id]: event.currentTarget.value,
-                    }))
-                  }
+                      [course.id]: value,
+                    }));
+                  }}
                   placeholder="추가할 영상 제목 검색"
                 />
                 {visibleAddVideos.length ? (
@@ -728,9 +729,10 @@ export default function AdminCoursesClient({
                       accept="image/png,image/jpeg,image/webp"
                       className={styles.hiddenFileInput}
                       onChange={(event) => {
-                        const file = event.target.files?.[0] ?? null;
+                        const input = event.currentTarget;
+                        const file = input.files?.[0] ?? null;
                         void handleThumbnailUpload(course.id, file);
-                        event.currentTarget.value = "";
+                        input.value = "";
                       }}
                     />
                   </label>
@@ -809,13 +811,14 @@ export default function AdminCoursesClient({
                           <input
                             type="text"
                             value={draftTitle}
-                            onChange={(event) =>
+                            onChange={(event) => {
+                              const value = event.currentTarget.value;
                               handleVideoTitleChange(
                                 course.id,
                                 video.id,
-                                event.currentTarget.value
-                              )
-                            }
+                                value
+                              );
+                            }}
                             onKeyDown={(event) => {
                               if (event.key === "Enter") {
                                 event.preventDefault();
