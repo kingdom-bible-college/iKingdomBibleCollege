@@ -168,12 +168,20 @@ export default function AdminCoursesClient({
       });
 
       if (!response.ok) {
-        alert("영상 목록 저장에 실패했습니다.");
+        const payload = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        alert(payload?.error ?? "영상 목록 저장에 실패했습니다.");
         return false;
       }
 
       setSavedAt(new Date().toLocaleTimeString("ko-KR"));
       return true;
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "영상 목록 저장에 실패했습니다.";
+      alert(message);
+      return false;
     } finally {
       setSaving(false);
     }

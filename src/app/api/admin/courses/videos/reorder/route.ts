@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSessionUser } from "@/lib/auth/session";
 import { syncCourseVideoMetadata } from "@/lib/courseVideoMetadata";
 
@@ -21,6 +22,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  await syncCourseVideoMetadata(courseId, orderedVideoIds);
-  return NextResponse.json({ ok: true });
+  try {
+    await syncCourseVideoMetadata(courseId, orderedVideoIds);
+    revalidatePath("/admin/courses");
+    revalidatePath("/courses");
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Failed to save course videos";
+    console.error("Failed to reorder course videos", error);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
