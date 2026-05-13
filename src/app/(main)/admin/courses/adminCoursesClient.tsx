@@ -82,6 +82,81 @@ export type AdminCourseItem = {
   videos: VideoItem[];
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const normalizeText = (value: unknown, fallback = "") =>
+  typeof value === "string" ? value : fallback;
+
+const normalizeVideoItem = (value: unknown): VideoItem | null => {
+  if (!isRecord(value)) return null;
+
+  const id = normalizeText(value.id).trim();
+  if (!id) return null;
+
+  const originalTitle = normalizeText(value.originalTitle, "Untitled") || "Untitled";
+
+  return {
+    id,
+    title: normalizeText(value.title, originalTitle) || originalTitle,
+    originalTitle,
+    durationLabel: normalizeText(value.durationLabel),
+    thumbnail:
+      typeof value.thumbnail === "string" && value.thumbnail ? value.thumbnail : null,
+  };
+};
+
+const normalizeAvailableVideo = (value: unknown): AdminAvailableVideo | null => {
+  const video = normalizeVideoItem(value);
+  if (!video) return null;
+
+  return {
+    id: video.id,
+    title: video.title,
+    durationLabel: video.durationLabel,
+    thumbnail: video.thumbnail,
+  };
+};
+
+const normalizeCourses = (value: unknown): AdminCourseItem[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      if (!isRecord(item)) return null;
+
+      const id = Number(item.id);
+      if (!Number.isFinite(id)) return null;
+
+      const videos = Array.isArray(item.videos)
+        ? item.videos
+            .map(normalizeVideoItem)
+            .filter((video): video is VideoItem => Boolean(video))
+        : [];
+
+      return {
+        id,
+        coverImage:
+          typeof item.coverImage === "string" && item.coverImage
+            ? item.coverImage
+            : null,
+        title: normalizeText(item.title, "Untitled") || "Untitled",
+        status: normalizeText(item.status, "active") || "active",
+        totalLectures: videos.length,
+        videos,
+      };
+    })
+    .filter((course): course is AdminCourseItem => Boolean(course));
+};
+
+const normalizeAvailableVideos = (value: unknown): AdminAvailableVideo[] => {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map(normalizeAvailableVideo)
+    .filter((video): video is AdminAvailableVideo => Boolean(video));
+};
+
 const moveItem = <T,>(list: T[], fromIndex: number, toIndex: number) => {
   const updated = [...list];
   const [item] = updated.splice(fromIndex, 1);
@@ -93,10 +168,16 @@ export default function AdminCoursesClient({
   initialCourses = [],
   availableVideos = [],
 }: {
-  initialCourses?: AdminCourseItem[];
-  availableVideos?: AdminAvailableVideo[];
+  initialCourses?: unknown;
+  availableVideos?: unknown;
 }) {
-  const [courses, setCourses] = useState(initialCourses);
+  const [courses, setCourses] = useState<AdminCourseItem[]>(() =>
+    normalizeCourses(initialCourses)
+  );
+  const availableVideoItems = useMemo(
+    () => normalizeAvailableVideos(availableVideos),
+    [availableVideos]
+  );
   const [titleDrafts, setTitleDrafts] = useState<Record<string, string>>({});
   const [addSearchDrafts, setAddSearchDrafts] = useState<Record<number, string>>({});
   const [selectedAddVideoIds, setSelectedAddVideoIds] = useState<
@@ -122,8 +203,8 @@ export default function AdminCoursesClient({
   }, [courses]);
 
   const availableVideoMap = useMemo(
-    () => new Map(availableVideos.map((video) => [video.id, video])),
-    [availableVideos]
+    () => new Map(availableVideoItems.map((video) => [video.id, video])),
+    [availableVideoItems]
   );
 
   const persistOrder = async (nextCourses: AdminCourseItem[]) => {
@@ -482,7 +563,7 @@ export default function AdminCoursesClient({
         const addSearch = addSearchDrafts[course.id] ?? "";
         const addKeyword = addSearch.trim().toLowerCase();
         const selectedForAdd = selectedAddVideoIds[course.id] ?? [];
-        const visibleAddVideos = availableVideos
+        const visibleAddVideos = availableVideoItems
           .filter((video) => !existingVideoIds.has(video.id))
           .filter((video) =>
             addKeyword ? video.title.toLowerCase().includes(addKeyword) : true
