@@ -66,6 +66,13 @@ type VideoItem = {
   thumbnail: string | null;
 };
 
+export type AdminAvailableVideo = {
+  id: string;
+  title: string;
+  durationLabel: string;
+  thumbnail: string | null;
+};
+
 export type AdminCourseItem = {
   id: number;
   coverImage: string | null;
@@ -84,11 +91,18 @@ const moveItem = <T,>(list: T[], fromIndex: number, toIndex: number) => {
 
 export default function AdminCoursesClient({
   initialCourses,
+  availableVideos,
 }: {
   initialCourses: AdminCourseItem[];
+  availableVideos: AdminAvailableVideo[];
 }) {
   const [courses, setCourses] = useState(initialCourses);
   const [titleDrafts, setTitleDrafts] = useState<Record<string, string>>({});
+  const [addSearchDrafts, setAddSearchDrafts] = useState<Record<number, string>>({});
+  const [selectedAddVideoIds, setSelectedAddVideoIds] = useState<
+    Record<number, string[]>
+  >({});
+  const [openAddCourseId, setOpenAddCourseId] = useState<number | null>(null);
   const [draggingId, setDraggingId] = useState<number | null>(null);
   const [draggingVideo, setDraggingVideo] = useState<{
     courseId: number;
@@ -106,6 +120,11 @@ export default function AdminCoursesClient({
     courses.forEach((course, index) => map.set(course.id, index));
     return map;
   }, [courses]);
+
+  const availableVideoMap = useMemo(
+    () => new Map(availableVideos.map((video) => [video.id, video])),
+    [availableVideos]
+  );
 
   const persistOrder = async (nextCourses: AdminCourseItem[]) => {
     setSaving(true);
@@ -142,12 +161,19 @@ export default function AdminCoursesClient({
     setSaving(true);
     setSavedAt(null);
     try {
-      await fetch("/api/admin/courses/videos/reorder", {
+      const response = await fetch("/api/admin/courses/videos/reorder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ courseId, orderedVideoIds }),
       });
+
+      if (!response.ok) {
+        alert("영상 목록 저장에 실패했습니다.");
+        return false;
+      }
+
       setSavedAt(new Date().toLocaleTimeString("ko-KR"));
+      return true;
     } finally {
       setSaving(false);
     }
@@ -210,6 +236,83 @@ export default function AdminCoursesClient({
       body: JSON.stringify({ id: courseId }),
     });
     setCourses((prev) => prev.filter((course) => course.id !== courseId));
+  };
+
+  const toggleAddVideo = (courseId: number, videoId: string) => {
+    setSelectedAddVideoIds((prev) => {
+      const current = prev[courseId] ?? [];
+      const next = current.includes(videoId)
+        ? current.filter((id) => id !== videoId)
+        : [...current, videoId];
+
+      return { ...prev, [courseId]: next };
+    });
+  };
+
+  const handleAddVideos = async (course: AdminCourseItem) => {
+    const selectedIds = selectedAddVideoIds[course.id] ?? [];
+    const existingIdSet = new Set(course.videos.map((video) => video.id));
+    const newIds = selectedIds.filter((id) => !existingIdSet.has(id));
+    if (!newIds.length) return;
+
+    const orderedVideoIds = [
+      ...course.videos.map((video) => video.id),
+      ...newIds,
+    ];
+    const updated = await persistVideoOrder(course.id, orderedVideoIds);
+    if (!updated) return;
+
+    const appendedVideos: VideoItem[] = newIds
+      .map((id) => availableVideoMap.get(id))
+      .filter((video): video is AdminAvailableVideo => Boolean(video))
+      .map((video) => ({
+        id: video.id,
+        title: video.title,
+        originalTitle: video.title,
+        durationLabel: video.durationLabel,
+        thumbnail: video.thumbnail,
+      }));
+
+    setCourses((prev) =>
+      prev.map((item) =>
+        item.id === course.id
+          ? {
+              ...item,
+              totalLectures: item.videos.length + appendedVideos.length,
+              videos: [...item.videos, ...appendedVideos],
+            }
+          : item
+      )
+    );
+    setSelectedAddVideoIds((prev) => ({ ...prev, [course.id]: [] }));
+    setAddSearchDrafts((prev) => ({ ...prev, [course.id]: "" }));
+    setOpenAddCourseId(null);
+  };
+
+  const handleRemoveVideo = async (courseId: number, videoId: string) => {
+    const course = courses.find((item) => item.id === courseId);
+    if (!course) return;
+    const video = course.videos.find((item) => item.id === videoId);
+    const ok = confirm(`"${video?.title ?? "선택한 영상"}"을 강의에서 제거할까요?`);
+    if (!ok) return;
+
+    const orderedVideoIds = course.videos
+      .filter((item) => item.id !== videoId)
+      .map((item) => item.id);
+    const updated = await persistVideoOrder(courseId, orderedVideoIds);
+    if (!updated) return;
+
+    setCourses((prev) =>
+      prev.map((item) =>
+        item.id === courseId
+          ? {
+              ...item,
+              totalLectures: orderedVideoIds.length,
+              videos: item.videos.filter((current) => current.id !== videoId),
+            }
+          : item
+      )
+    );
   };
 
   const handleThumbnailUpload = async (courseId: number, file: File | null) => {
@@ -367,6 +470,17 @@ export default function AdminCoursesClient({
       </div>
 
       {courses.map((course) => {
+        const existingVideoIds = new Set(course.videos.map((video) => video.id));
+        const addSearch = addSearchDrafts[course.id] ?? "";
+        const addKeyword = addSearch.trim().toLowerCase();
+        const selectedForAdd = selectedAddVideoIds[course.id] ?? [];
+        const visibleAddVideos = availableVideos
+          .filter((video) => !existingVideoIds.has(video.id))
+          .filter((video) =>
+            addKeyword ? video.title.toLowerCase().includes(addKeyword) : true
+          )
+          .slice(0, 80);
+
         return (
           <div
             key={course.id}
@@ -412,7 +526,88 @@ export default function AdminCoursesClient({
               <span>선택된 영상</span>
               <strong>{course.videos.length}개</strong>
               <em>드래그해서 순서 변경</em>
+              <button
+                type="button"
+                className={styles.ghostButton}
+                onClick={() =>
+                  setOpenAddCourseId((current) =>
+                    current === course.id ? null : course.id
+                  )
+                }
+              >
+                영상 추가
+              </button>
             </div>
+            {openAddCourseId === course.id ? (
+              <div className={styles.addVideoPanel}>
+                <div className={styles.addVideoPanelHeader}>
+                  <strong>Vimeo 영상 추가</strong>
+                  <span>{selectedForAdd.length}개 선택됨</span>
+                </div>
+                <input
+                  type="search"
+                  className={styles.addVideoSearch}
+                  value={addSearch}
+                  onChange={(event) =>
+                    setAddSearchDrafts((prev) => ({
+                      ...prev,
+                      [course.id]: event.currentTarget.value,
+                    }))
+                  }
+                  placeholder="추가할 영상 제목 검색"
+                />
+                {visibleAddVideos.length ? (
+                  <div className={styles.addVideoList}>
+                    {visibleAddVideos.map((video) => {
+                      const checked = selectedForAdd.includes(video.id);
+                      return (
+                        <label
+                          key={video.id}
+                          className={`${styles.addVideoItem} ${
+                            checked ? styles.addVideoItemActive : ""
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleAddVideo(course.id, video.id)}
+                          />
+                          <span>{video.title}</span>
+                          <em>{video.durationLabel}</em>
+                        </label>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className={styles.matchListEmpty}>
+                    추가할 Vimeo 영상이 없습니다.
+                  </div>
+                )}
+                <div className={styles.addVideoActions}>
+                  <button
+                    type="button"
+                    className={styles.ghostButton}
+                    onClick={() => {
+                      setSelectedAddVideoIds((prev) => ({
+                        ...prev,
+                        [course.id]: [],
+                      }));
+                      setOpenAddCourseId(null);
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.primaryButton}
+                    disabled={!selectedForAdd.length || saving}
+                    onClick={() => void handleAddVideos(course)}
+                  >
+                    {saving ? "저장 중..." : "선택 영상 추가"}
+                  </button>
+                </div>
+              </div>
+            ) : null}
             <div className={styles.heroPreview}>
               <div className={styles.heroPreviewThumb}>
                 {course.coverImage ? (
@@ -564,6 +759,13 @@ export default function AdminCoursesClient({
                               원본으로 복원
                             </button>
                           ) : null}
+                          <button
+                            type="button"
+                            className={styles.videoRemoveButton}
+                            onClick={() => void handleRemoveVideo(course.id, video.id)}
+                          >
+                            영상 제거
+                          </button>
                         </div>
                       </div>
                     </div>

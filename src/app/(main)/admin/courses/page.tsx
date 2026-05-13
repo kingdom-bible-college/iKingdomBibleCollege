@@ -24,6 +24,7 @@ import {
 } from "@/lib/courseVideoMetadata";
 import styles from "./adminCourses.module.css";
 import AdminCoursesClient, {
+  type AdminAvailableVideo,
   type AdminCourseItem,
 } from "./adminCoursesClient";
 import { formatLessonDuration } from "@/lib/time";
@@ -117,6 +118,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     courseRows.map((course) => course.id)
   );
   const needsPicker = view === "add";
+  const needsVimeoCatalog = needsPicker || view === "added";
 
   if (!needsPicker && hasMissingCourseVideoMetadata(orderRows)) {
     await syncCourseVideoMetadataByCourseIds(courseRows.map((course) => course.id));
@@ -129,7 +131,8 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     new Set(orderRows.map((row) => row.vimeoId))
   );
 
-  const shouldLoadAllVideos = needsPicker && selectedProjectId === "all";
+  const shouldLoadAllVideos =
+    needsVimeoCatalog && (selectedProjectId === "all" || view === "added");
   const shouldLoadProjectVideos = needsPicker && selectedProjectId !== "all";
   const [videos, projects, projectVideos] = await Promise.all([
     shouldLoadAllVideos
@@ -167,6 +170,12 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
   });
   const pickerSource = selectedProjectId !== "all" ? projectVideos : videos;
   const pickerVideos = pickerSource.map((video) => ({
+    id: video.id,
+    title: video.title,
+    durationLabel: formatLessonDuration(video.duration),
+    thumbnail: video.thumbnail,
+  }));
+  const availableVideos: AdminAvailableVideo[] = videos.map((video) => ({
     id: video.id,
     title: video.title,
     durationLabel: formatLessonDuration(video.duration),
@@ -314,7 +323,10 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
           </form>
         </div>
       ) : (
-        <AdminCoursesClient initialCourses={courseItems} />
+        <AdminCoursesClient
+          initialCourses={courseItems}
+          availableVideos={availableVideos}
+        />
       )}
     </section>
   );

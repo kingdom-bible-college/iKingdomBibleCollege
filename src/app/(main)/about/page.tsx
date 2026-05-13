@@ -11,7 +11,7 @@ const menuItems: { id: MenuType; title: string }[] = [
   { id: 'recommendation', title: '추천사' },
   { id: 'greeting', title: '학장 인사' },
   { id: 'introduction', title: '커리큘럼' },
-  { id: 'admission', title: '모집요강' },
+  { id: 'admission', title: '모집요망' },
   { id: 'partners', title: '협력기관(MOU) 현황' },
 ];
 
@@ -346,10 +346,10 @@ function AboutPageContent() {
             </div>
           )}
 
-          {/* 2026학년도 모집요강 */}
+          {/* 2026학년도 모집요망 */}
           {activeMenu === 'admission' && (
             <div className={styles.contentSection}>
-              <h2 className={styles.contentTitle}>모집요강</h2>
+              <h2 className={styles.contentTitle}>모집요망</h2>
               
               {/* 1. 학사 일정 및 등록 안내 */}
               <div className={styles.admissionGroup}>
@@ -401,7 +401,7 @@ function AboutPageContent() {
                     <ul className={styles.infoList}>
                       <li><strong>KBC 본교</strong><span>042-824-3242</span></li>
                       <li><strong>사무처장</strong><span>도현우 (010-3542-3703)</span></li>
-                      <li><strong>간사</strong><span>전미라 (010-8966-0558)</span></li>
+                      <li><strong>간사</strong><span>전미래 (010-8966-0558)</span></li>
                     </ul>
                   </div>
                 </div>

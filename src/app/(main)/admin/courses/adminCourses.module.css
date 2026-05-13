@@ -54,6 +54,11 @@
   color: #fff;
 }
 
+.primaryButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .secondaryButton {
   background: #e5e7eb;
   color: #1f2937;
@@ -590,6 +595,102 @@
   color: #94a3b8;
 }
 
+.addVideoPanel {
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: #f8fbff;
+  padding: 14px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.addVideoPanelHeader,
+.addVideoActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.addVideoPanelHeader strong {
+  color: #0f172a;
+}
+
+.addVideoPanelHeader span {
+  color: #2563eb;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.addVideoSearch {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #ffffff;
+}
+
+.addVideoSearch:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.2);
+  border-color: #2563eb;
+}
+
+.addVideoList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 320px;
+  overflow: auto;
+}
+
+.addVideoItem {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.addVideoItem input {
+  width: 18px;
+  height: 18px;
+  accent-color: #111827;
+}
+
+.addVideoItem span {
+  color: #111827;
+  font-size: 0.9rem;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.addVideoItem em {
+  color: #64748b;
+  font-style: normal;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.addVideoItemActive {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.addVideoActions {
+  justify-content: flex-end;
+}
+
 .videoList {
   display: flex;
   flex-direction: column;
@@ -752,6 +853,14 @@
 
   .videoItem {
     grid-template-columns: 1fr;
+  }
+
+  .addVideoItem {
+    grid-template-columns: auto 1fr;
+  }
+
+  .addVideoItem em {
+    grid-column: 2;
   }
 }
 

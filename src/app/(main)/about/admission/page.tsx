@@ -4,7 +4,7 @@ export default function AdmissionPage() {
   return (
     <main className={styles.main}>
       <section className={styles.hero}>
-        <h1 className={styles.heroTitle}>2026학년도 모집요강</h1>
+        <h1 className={styles.heroTitle}>2026학년도 모집요망</h1>
         <p className={styles.heroSubtitle}>KBC 소개</p>
       </section>
 
