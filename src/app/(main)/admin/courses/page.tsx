@@ -31,6 +31,7 @@ import { formatLessonDuration } from "@/lib/time";
 import AdminVideoPicker from "./adminVideoPicker";
 import SubmitButton from "./submitButton";
 import SyncCoursesButton from "./syncCoursesButton";
+import { createCourseSchema } from "@/lib/validations/adminCourses";
 
 const toSlug = (value: string) =>
   value
@@ -43,8 +44,19 @@ const createCourseAction = async (formData: FormData) => {
   "use server";
   await requireAdmin();
 
-  const title = String(formData.get("title") || "").trim();
-  if (!title) return;
+  let selectedVideoIds: unknown;
+  try {
+    selectedVideoIds = JSON.parse(String(formData.get("selectedVideoIds") || "[]"));
+  } catch {
+    return;
+  }
+  const parsed = createCourseSchema.safeParse({
+    title: formData.get("title"),
+    status: formData.get("status") ?? "draft",
+    selectedVideoIds,
+  });
+  if (!parsed.success) return;
+  const { title, status, selectedVideoIds: selectedIds } = parsed.data;
 
   const baseSlug = toSlug(title);
   let slug = baseSlug;
@@ -54,24 +66,13 @@ const createCourseAction = async (formData: FormData) => {
     attempt += 1;
   }
 
-  const selectedRaw = String(formData.get("selectedVideoIds") || "[]");
-  let selectedIds: string[] = [];
-  try {
-    const parsed = JSON.parse(selectedRaw);
-    if (Array.isArray(parsed)) {
-      selectedIds = parsed.map((id) => String(id)).filter(Boolean);
-    }
-  } catch {
-    selectedIds = [];
-  }
-
   const created = await createCourse({
     title,
     slug,
     heroVimeoId: selectedIds[0] ?? null,
     matchType: "manual",
     matchValue: title,
-    status: "active",
+    status,
     sortOrder: 0,
   });
 
@@ -155,6 +156,7 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
     const selectedRows = dedupeCourseVideoRows(rowsByCourseId.get(course.id) ?? []);
     return {
       id: course.id,
+      slug: course.slug,
       coverImage: course.coverImage ?? null,
       title: course.title,
       status: course.status,
@@ -304,6 +306,13 @@ export default async function AdminCoursesPage({ searchParams }: PageProps) {
             <label className={`${styles.field} ${styles.fullRow}`}>
               <span>강의명</span>
               <input name="title" required placeholder="예: 포스트인카운터" />
+            </label>
+            <label className={`${styles.field} ${styles.fullRow}`}>
+              <span>게시 상태</span>
+              <select name="status" defaultValue="draft">
+                <option value="draft">미게시 — 관리자만 미리보기</option>
+                <option value="active">게시 — 승인된 회원에게 공개</option>
+              </select>
             </label>
             <div className={styles.fullRow}>
               <p className={styles.projectHint}>

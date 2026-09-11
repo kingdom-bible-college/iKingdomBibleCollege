@@ -1,5 +1,18 @@
 import { z } from "zod";
 
+export const coursePublicationStatusSchema = z.enum(["draft", "active"]);
+
+export const createCourseSchema = z.object({
+  title: z.string().trim().min(1).max(255),
+  status: coursePublicationStatusSchema.default("draft"),
+  selectedVideoIds: z.array(z.string().regex(/^\d+$/)).max(500),
+});
+
+export const updateCourseStatusSchema = z.object({
+  courseId: z.coerce.number().int().positive(),
+  status: coursePublicationStatusSchema,
+});
+
 export const updateCourseThumbnailSchema = z.object({
   courseId: z.coerce.number().int().positive(),
   coverImage: z.union([

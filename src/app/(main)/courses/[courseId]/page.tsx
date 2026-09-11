@@ -9,6 +9,7 @@ import {
 import { getVimeoVideos } from "@/lib/vimeo";
 import { buildCourseGroups, buildCurriculum } from "../courseUtils";
 import { requireUser } from "@/lib/auth/session";
+import { canViewCourse } from "@/lib/courseAccess";
 import { getCourseBySlug } from "@/db/queries/courses";
 import { getCourseVideoOrdersByCourseIds } from "@/db/queries/courseVideoOrders";
 import {
@@ -31,10 +32,12 @@ export default async function CourseDetailPage({ params }: PageProps) {
   const slug = decodeURIComponent(courseId);
 
   // 1) 인증 + DB 조회 병렬 실행
-  const [, courseRow] = await Promise.all([
+  const [user, courseRow] = await Promise.all([
     requireUser(),
     getCourseBySlug(slug),
   ]);
+
+  if (courseRow && !canViewCourse(courseRow, user)) notFound();
 
   let course = defaultCourseMeta;
   let activeVideos: Awaited<ReturnType<typeof getVimeoVideos>> = [];
@@ -84,6 +87,9 @@ export default async function CourseDetailPage({ params }: PageProps) {
         <div className={styles.heroInner}>
           <div className={styles.heroInfo}>
             <p className={styles.breadcrumb}>강의 &gt; {course.title}</p>
+            {courseRow && courseRow.status !== "active" && (
+              <p role="status">미게시 강의 · 관리자 미리보기</p>
+            )}
             <h1 className={styles.heroTitle}>{course.title}</h1>
             <p className={styles.heroSubtitle}>{course.subtitle}</p>
           </div>

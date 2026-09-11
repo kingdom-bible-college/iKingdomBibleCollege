@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import styles from "./adminCourses.module.css";
 
 const MAX_THUMBNAIL_DIMENSION = 960;
@@ -75,6 +76,7 @@ export type AdminAvailableVideo = {
 
 export type AdminCourseItem = {
   id: number;
+  slug: string;
   coverImage: string | null;
   title: string;
   status: string;
@@ -138,6 +140,7 @@ const normalizeCourses = (value: unknown): AdminCourseItem[] => {
 
       return {
         id,
+        slug: normalizeText(item.slug),
         coverImage:
           typeof item.coverImage === "string" && item.coverImage
             ? item.coverImage
@@ -194,6 +197,30 @@ export default function AdminCoursesClient({
   const [saving, setSaving] = useState(false);
   const [savingTitleKey, setSavingTitleKey] = useState<string | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [changingStatusId, setChangingStatusId] = useState<number | null>(null);
+
+  const handleStatusChange = async (course: AdminCourseItem) => {
+    const status = course.status === "active" ? "draft" : "active";
+    const message = status === "active"
+      ? `‘${course.title}’ 강의를 승인된 회원에게 게시하시겠습니까?`
+      : `‘${course.title}’ 강의를 미게시로 전환하시겠습니까?`;
+    if (!confirm(message)) return;
+    setChangingStatusId(course.id);
+    try {
+      const response = await fetch("/api/admin/courses/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: course.id, status }),
+      });
+      if (!response.ok) throw new Error("게시 상태 변경에 실패했습니다.");
+      setCourses((current) => current.map((item) => item.id === course.id ? { ...item, status } : item));
+      setSavedAt(new Date().toLocaleTimeString("ko-KR"));
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "게시 상태 변경에 실패했습니다.");
+    } finally {
+      setChangingStatusId(null);
+    }
+  };
 
   const getVideoDraftKey = (courseId: number, videoId: string) =>
     `${courseId}:${videoId}`;
@@ -593,6 +620,7 @@ export default function AdminCoursesClient({
         return (
           <div
             key={course.id}
+            id={`course-${course.id}`}
             className={`${styles.rowGroup} ${
               draggingId === course.id ? styles.dragging : ""
             }`}
@@ -619,8 +647,21 @@ export default function AdminCoursesClient({
               <strong>{course.title}</strong>
             </div>
             <div>{course.totalLectures}개</div>
-            <div>{course.status}</div>
+            <div>{course.status === "active" ? "게시됨" : "미게시"}</div>
             <div className={styles.rowActions}>
+              {course.slug && (
+                <Link href={`/courses/${encodeURIComponent(course.slug)}`} className={styles.ghostButton} prefetch={false}>
+                  미리보기
+                </Link>
+              )}
+              <button
+                className={styles.ghostButton}
+                type="button"
+                disabled={changingStatusId !== null}
+                onClick={() => void handleStatusChange(course)}
+              >
+                {changingStatusId === course.id ? "변경 중..." : course.status === "active" ? "게시 중지" : "게시"}
+              </button>
               <button
                 className={styles.ghostButton}
                 type="button"

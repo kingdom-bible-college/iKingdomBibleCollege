@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCourseBySlug } from "@/db/queries/courses";
 import { getSessionUser } from "@/lib/auth/session";
+import { canViewCourse } from "@/lib/courseAccess";
 
 const parseDataUrl = (value: string) => {
   const match = value.match(/^data:(image\/[\w.+-]+);base64,(.+)$/);
@@ -26,7 +27,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   const { courseSlug } = await params;
   const course = await getCourseBySlug(decodeURIComponent(courseSlug));
 
-  if (!course?.coverImage) {
+  if (!course?.coverImage || !canViewCourse(course, user)) {
     return new NextResponse("Not found", { status: 404 });
   }
 
@@ -38,7 +39,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
   return new NextResponse(parsed.buffer, {
     headers: {
       "Content-Type": parsed.contentType,
-      "Cache-Control": "private, max-age=3600, stale-while-revalidate=86400",
+      "Cache-Control": "private, no-store",
     },
   });
 }

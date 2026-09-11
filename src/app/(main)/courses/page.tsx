@@ -35,7 +35,7 @@ export default async function CoursesListPage() {
       activeCourses.map((course) => course.id)
     );
   }
-  const fallbackVideos = activeCourses.length ? [] : await getVimeoVideos();
+  const fallbackVideos = courseRows.length ? [] : await getVimeoVideos();
   const rowsByCourseId = new Map<number, typeof orderRows>();
   orderRows.forEach((row) => {
     if (!rowsByCourseId.has(row.courseId)) {
@@ -79,7 +79,7 @@ export default async function CoursesListPage() {
   });
 
   const courseGroups =
-    activeCourses.length > 0
+    courseRows.length > 0
       ? manualGroups
       : buildCourseGroups(fallbackVideos, courseCatalog);
 
